@@ -8,6 +8,13 @@ const app = express();
 
 app.use(express.json());
 
+app.use(
+  cors({
+    origin: "http://localhost:5173", // frontend URL
+    credentials: true, // penting biar cookie refreshToken ikut dikirim
+  })
+);
+
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
