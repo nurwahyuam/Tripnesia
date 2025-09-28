@@ -4,15 +4,20 @@ export const apiFetch = async (endpoint, options = {}) => {
   const res = await fetch(`${URL_API}${endpoint}`, {
     credentials: "include",
     headers: {
-      "Context-Type": "application/json",
+      "Content-Type": "application/json",
       ...(options.headers || {}),
     },
     ...options,
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => {});
-    throw new Error(err.message || `API Error: ${err.status}`);
+    let err = {};
+    try {
+      err = await res.json();
+    } catch {
+      err = {};
+    }
+    throw new Error(err.message || err.error || res.statusText || `API Error: ${res.status}`);
   }
 
   return res.json();

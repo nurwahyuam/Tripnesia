@@ -4,11 +4,16 @@ import { useLogout } from "../hooks/useLogout";
 
 const UserLayout = () => {
   const { user } = useAuthContext();
+
+  console.log(user);
   const { logout } = useLogout();
 
   if (!user) {
-    // kalau belum login, redirect ke halaman login
     return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "admin") {
+    return <Navigate to="/user/dashboard" replace />;
   }
 
   return (
@@ -21,10 +26,7 @@ const UserLayout = () => {
         <nav className="flex gap-4">
           <Link to="/dashboard">Dashboard</Link>
           <Link to="/profile">Profile</Link>
-          <button
-            onClick={logout}
-            className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
-          >
+          <button onClick={logout} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
             Logout
           </button>
         </nav>
