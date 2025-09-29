@@ -1,31 +1,46 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthProvider";
-import GuestLayout from "./layouts/GuestLayout";
-import UserLayout from "./layouts/UserLayaout";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgetPassword from "./pages/ForgetPassword";
 import Dashboard from "./pages/User/Dashboard";
-import Profile from "./pages/User/Profile";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<GuestLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forget-password" element={<ForgetPassword />} />
-          </Route>
+  const { user } = useAuth();
 
-          <Route element={<UserLayout />}>
-            <Route path="/user/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Guest routes */}
+        <Route
+          path="/login"
+          element={!user ? <Login /> : <Navigate to={`/${user.role}/dashboard`} replace />}
+        />
+        <Route
+          path="/forget-password"
+          element={!user ? <ForgetPassword /> : <Navigate to={`/${user.role}/dashboard`} replace />}
+        />
+        <Route
+          path="/signup"
+          element={!user ? <Signup /> : <Navigate to={`/${user.role}/dashboard`} replace />}
+        />
+
+        {/* Customer Protected */}
+        <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
+          <Route path="/customer/dashboard" element={<Dashboard />} />
+        </Route>
+
+        {/* Admin Protected */}
+        {/* <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        </Route> */}
+
+        {/* Default route */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

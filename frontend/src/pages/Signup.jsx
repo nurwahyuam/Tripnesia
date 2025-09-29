@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BgAuth from "../assets/Bg-Auth.png";
 import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
@@ -15,12 +15,11 @@ const Signup = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { signup } = useSignup();
-  const navigate = useNavigate();
+  const { handleSignup } = useSignup();
+  // const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
 
     if (password !== confirmPassword) {
       setError("Password dan konfirmasi password tidak sama.");
@@ -29,8 +28,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await signup(name, email, password, "customer", phone, subscribe);
-      navigate("/login");
+      handleSignup(name, email, password, phone, subscribe);
     } catch (err) {
       setError(err.message);
     } finally {

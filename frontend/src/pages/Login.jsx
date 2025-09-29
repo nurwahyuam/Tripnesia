@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLogin } from "../hooks/useLogin";
-import { useAuthContext } from "../hooks/useAuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BgAuth from "../assets/Bg-Auth.png";
 import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
@@ -9,37 +8,21 @@ import InputForm from "../components/InputForm";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { login } = useLogin();
-  const { user } = useAuthContext();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/user/dashboard");
-    }
-  }, [user, navigate]);
+  const { handleLogin, error } = useLogin();
+  // const { user } = useAuthContext();
+  // useEffect(() => {
+  //   if (user) {
+  //     navigate("/user/dashboard");
+  //   }
+  // }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
-
     try {
-      const data = await login(email, password);
-      console.log(data.user)
-      console.log(data.accessToken)
-
-      // redirect setelah login sukses
-      if (data?.user?.role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/user/dashboard");
-      }
-    } catch (err) {
-      setError(err.message);
+      handleLogin(email, password);
     } finally {
       setLoading(false);
     }
@@ -108,7 +91,7 @@ const Login = () => {
           </p>
 
           <div className="flex items-center justify-center mt-10 gap-2">
-            <ApplicationLogo width={88} type="black"/>
+            <ApplicationLogo width={88} type="black" />
             <p className="text-gray-600 mt-1.5">Alright Reserve</p>
           </div>
         </div>

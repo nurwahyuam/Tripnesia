@@ -1,22 +1,16 @@
 // src/hooks/useLogout.js
-import { useAuthContext } from "./useAuthContext";
+import { useAuth } from "./useAuth";
 
 export const useLogout = () => {
-  const { setUser, setAccessToken } = useAuthContext();
+  const { logout } = useAuth();
 
-  const logout = async () => {
+  const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      setUser(null);
-      setAccessToken(null);
+      await logout()
     } catch (err) {
       console.error("Gagal logout:", err);
     }
   };
 
-  return { logout };
+  return { handleLogout };
 };

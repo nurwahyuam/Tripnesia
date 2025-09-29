@@ -1,35 +1,28 @@
-import { useAuthContext } from "./useAuthContext";
+import { useState } from "react";
+import { useAuth } from "./useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const useLogin = () => {
-  const { setUser, setAccessToken } = useAuthContext();
+  const { login, user, accessToken } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
-  const login = async (email, password) => {
-    const res = await fetch("http://localhost:4000/api/auth/login", {
-      // pakai URL lengkap
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-      credentials: "include",
-    });
-
-    let data = {};
+  const handleLogin = async (email, password) => {
     try {
-      const text = await res.text();
-      data = text ? JSON.parse(text) : {};
+      await login(email, password);
+
+      // redirect otomatis sesuai role
+      if (accessToken !== null){
+        if (user?.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/customer/dashboard");
+        }
+      }
     } catch (err) {
-      console.error("Gagal parse JSON login:", err);
+      setError(err.response?.data?.error || "Login gagal");
     }
-
-    if (!res.ok) {
-      // biar error detail ditampilkan
-      throw new Error(data.message || "Login gagal");
-    }
-
-    setAccessToken(data.accessToken);
-    setUser(data.user);
-
-    return data;
   };
 
-  return { login };
+  return { handleLogin, error };
 };

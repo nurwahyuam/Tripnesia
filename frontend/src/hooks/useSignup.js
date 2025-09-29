@@ -1,23 +1,27 @@
-import { apiFetch } from "../lib/api";
-import { useAuthContext } from "./useAuthContext";
+import { useState } from "react";
+import { useAuth } from "./useAuth";
+import { useNavigate } from "react-router-dom";
+
 
 export const useSignup = () => {
-  const { setUser } = useAuthContext();
+  const { signup, user } = useAuth();
+  const navigate = useNavigate()
+  const [error, setError] = useState(null);
 
-  const signup = async (name, email, password, role, number_telephone, support) => {
-    const res = await apiFetch("/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role, number_telephone, support }),
-    });
+  const handleSignup = async (name, email, password, number_telephone, support = false) => {
+    try {
+      await signup({ name, email, password, number_telephone, support });
 
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message || "Signup gagal");
-
-    setUser(data.user);
-    return data;
+      // redirect otomatis sesuai role
+      if (user?.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/customer/dashboard");
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || "Signup gagal");
+    }
   };
 
-  return { signup };
+  return { handleSignup, error };
 };
