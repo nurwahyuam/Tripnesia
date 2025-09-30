@@ -65,5 +65,18 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
   };
 
-  return <AuthContext.Provider value={{ user, accessToken, signup, login, logout, axiosAuth }}>{children}</AuthContext.Provider>;
+  const forgotPassword = async (email) => {
+    await axiosAuth.post("/forgot-password", { email });
+  };
+
+
+  const checkOTP = async (email, code) => {
+    await axiosAuth.post("/otp-check", { email, code });
+  };
+
+  const resetPassword = async (email, code, password) => {
+    await axiosAuth.post("/reset-password", { email, code, password });
+  };
+
+  return <AuthContext.Provider value={{ user, accessToken, signup, login, logout, forgotPassword, checkOTP, resetPassword, axiosAuth }}>{children}</AuthContext.Provider>;
 };

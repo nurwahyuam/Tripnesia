@@ -6,17 +6,11 @@ import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
 
 const Login = () => {
+  const { handleLogin, error, success } = useLogin();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const { handleLogin, error } = useLogin();
-  // const { user } = useAuthContext();
-  // useEffect(() => {
-  //   if (user) {
-  //     navigate("/user/dashboard");
-  //   }
-  // }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,6 +37,7 @@ const Login = () => {
           <h1 className="text-xl font-bold mb-4">Login</h1>
 
           {error && <div className="mb-4 p-2 bg-red-100 text-red-600 rounded-md">{error}</div>}
+          {success && <div className="mb-4 p-2 bg-green-100 text-green-600 rounded-md">{success}</div>}
 
           <form onSubmit={handleSubmit} className="">
             <div className="mb-4">
@@ -72,15 +67,15 @@ const Login = () => {
             <div className="my-2">
               <p>
                 Forgot your password?{" "}
-                <Link to="/forget-password" className="text-primary hover:underline">
+                <Link to="/forgot-password" className="text-primary hover:underline">
                   Reset it now.
                 </Link>
               </p>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full py-2 px-4 bg-primary text-white rounded-lg disabled:opacity-50 transition">
+            <Button type={"submit"} disabled={loading}>
               {loading ? "Loading..." : "Login"}
-            </button>
+            </Button>
           </form>
 
           <p className="text-center mt-2">

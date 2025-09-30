@@ -3,9 +3,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import ForgetPassword from "./pages/ForgetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/User/Dashboard";
 import { useAuth } from "./hooks/useAuth";
+import Welcome from "./pages/Guest/Welcome";
 
 function App() {
   const { user } = useAuth();
@@ -14,18 +15,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Guest routes */}
-        <Route
-          path="/login"
-          element={!user ? <Login /> : <Navigate to={`/${user.role}/dashboard`} replace />}
-        />
-        <Route
-          path="/forget-password"
-          element={!user ? <ForgetPassword /> : <Navigate to={`/${user.role}/dashboard`} replace />}
-        />
-        <Route
-          path="/signup"
-          element={!user ? <Signup /> : <Navigate to={`/${user.role}/dashboard`} replace />}
-        />
+        <Route path="/" element={!user ? <Welcome /> : <Navigate to={`/${user.role}/dashboard`} replace />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${user.role}/dashboard`} replace />} />
+        <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to={`/${user.role}/dashboard`} replace />} />
+        <Route path="/signup" element={!user ? <Signup /> : <Navigate to={`/${user.role}/dashboard`} replace />} />
 
         {/* Customer Protected */}
         <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
@@ -38,7 +31,7 @@ function App() {
         </Route> */}
 
         {/* Default route */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

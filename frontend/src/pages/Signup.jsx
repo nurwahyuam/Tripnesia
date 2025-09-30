@@ -4,6 +4,7 @@ import BgAuth from "../assets/Bg-Auth.png";
 import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
 import { useSignup } from "../hooks/useSignup";
+import Button from "../components/Button";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -12,10 +13,9 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [subscribe, setSubscribe] = useState(false);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { handleSignup } = useSignup();
+  const { handleSignup, error, setError, success } = useSignup();
   // const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -51,6 +51,7 @@ const Signup = () => {
           <h1 className="text-xl font-bold mb-4">Register</h1>
 
           {error && <div className="mb-4 p-2 bg-red-100 text-red-600 rounded-md">{error}</div>}
+          {success && <div className="mb-4 p-2 bg-green-100 text-green-600 rounded-md">{success}</div>}
 
           <form onSubmit={handleSubmit} className="">
             <div className="grid grid-cols-2 gap-3 mb-4">
@@ -82,9 +83,10 @@ const Signup = () => {
               </label>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary transition disabled:opacity-50">
-              {loading ? "Loading..." : "Register"}
-            </button>
+            <Button 
+              type={"submit"}
+              disabled={loading}
+            >{loading ? "Loading..." : "Register"}</Button>
           </form>
 
           <p className="text-center mt-2">
