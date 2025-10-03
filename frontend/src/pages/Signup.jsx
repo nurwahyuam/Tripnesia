@@ -28,7 +28,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      handleSignup(name, email, password, phone, subscribe);
+      await handleSignup(name, email, password, phone, subscribe);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -86,6 +86,7 @@ const Signup = () => {
             <Button 
               type={"submit"}
               disabled={loading}
+              className="cursor-pointer"
             >{loading ? "Loading..." : "Register"}</Button>
           </form>
 

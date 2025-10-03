@@ -33,7 +33,6 @@ const signup = async (req, res) => {
     const accessToken = createAccessToken(user);
     const refreshToken = createRefreshToken(user);
 
-    // Simpan refreshToken ke DB (opsional)
     user.refreshToken = refreshToken;
     await user.save();
 

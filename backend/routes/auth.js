@@ -6,8 +6,11 @@ const {
   refresh,
   forgotPassword,
   checkOTP,
-  resetPassword, 
+  resetPassword,
+  getMe
 } = require("../controller/authController");
+
+const { verifyToken } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -19,6 +22,8 @@ router.post("/login", login);
 router.post("/refresh", refresh);
 // LOGOUT
 router.post("/logout", logout);
+
+// FORGOT PASSWORD
 router.post("/forgot-password", forgotPassword);
 router.post("/otp-check", checkOTP);
 router.post("/reset-password", resetPassword);

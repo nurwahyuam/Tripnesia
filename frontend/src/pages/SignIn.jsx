@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import BgAuth from "../assets/Bg-Auth.png";
 import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
+import Button from "../components/Button";
 
 const Login = () => {
   const { handleLogin, error, success } = useLogin();
@@ -16,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      handleLogin(email, password);
+      await handleLogin(email, password);
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ const Login = () => {
               </p>
             </div>
 
-            <Button type={"submit"} disabled={loading}>
+            <Button type={"submit"} disabled={loading} className="cursor-pointer" color="bg-primary text-white">
               {loading ? "Loading..." : "Login"}
             </Button>
           </form>

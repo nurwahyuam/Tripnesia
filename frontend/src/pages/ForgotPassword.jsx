@@ -176,13 +176,8 @@ const ForgotPassword = () => {
             {step !== 4 && (
               <Button
                 type="submit"
-                disabled={
-                  loading ||
-                  (step === 1 && email.trim() === "") || // email wajib
-                  (step === 2 && (timeLeft === 0 || otp.join("").length !== 6)) || // otp wajib & tidak expired
-                  (step === 3 && password.trim() === "") // password wajib
-                }
-                className={loading ? "cursor-progress" : (step === 1 && email.trim() === "") || (step === 2 && otp.join("").length !== 6) || (step === 3 && password.trim() === "") ? "cursor-not-allowed" : "cursor-pointer"}
+                disabled={loading}
+                className={"cursor-pointer"}
               >
                 {loading ? "Loading..." : step === 1 ? "Kirim OTP" : step === 2 ? "Verifikasi OTP" : "Reset Password"}
               </Button>

@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
+// const seederAdmin = require("./seeder/admin");?
 
 const app = express();
 

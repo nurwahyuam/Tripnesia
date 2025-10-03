@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
+import { jwtDecode } from "jwt-decode";
 
 export const AuthProvider = ({ children }) => {
   // Inisialisasi dari localStorage
@@ -8,6 +9,23 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+  const [role, setRole] = useState(() => {
+    if (user) {
+      const decoded = jwtDecode(localStorage.getItem("accessToken"));
+      return decoded.role;
+    }
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const storedUser = localStorage.getItem("user");
+
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
+      const decoded = jwtDecode(token);
+      setRole(decoded.role); // ambil role dari token
+    }
+  }, []);
 
   const [accessToken, setAccessToken] = useState(() => {
     return localStorage.getItem("accessToken") || null;
@@ -45,16 +63,22 @@ export const AuthProvider = ({ children }) => {
     setAccessToken(data.accessToken);
     localStorage.setItem("user", JSON.stringify(data.user));
     localStorage.setItem("accessToken", data.accessToken);
-    return data;
+    // decode token untuk ambil role
+    const decoded = jwtDecode(data.accessToken);
+    setRole(decoded.role); // set role di state saja
   };
 
   const login = async (email, password) => {
     const { data } = await axiosAuth.post("/login", { email, password });
-    setUser(data.user);
-    setAccessToken(data.accessToken);
+
+    setUser(data.user); // simpan user di state
+    setAccessToken(data.accessToken); // simpan token di state/localStorage
     localStorage.setItem("user", JSON.stringify(data.user));
     localStorage.setItem("accessToken", data.accessToken);
-    return data;
+
+    // decode token untuk ambil role
+    const decoded = jwtDecode(data.accessToken);
+    setRole(decoded.role); // set role di state saja
   };
 
   const logout = async () => {
@@ -69,7 +93,6 @@ export const AuthProvider = ({ children }) => {
     await axiosAuth.post("/forgot-password", { email });
   };
 
-
   const checkOTP = async (email, code) => {
     await axiosAuth.post("/otp-check", { email, code });
   };
@@ -78,5 +101,5 @@ export const AuthProvider = ({ children }) => {
     await axiosAuth.post("/reset-password", { email, code, password });
   };
 
-  return <AuthContext.Provider value={{ user, accessToken, signup, login, logout, forgotPassword, checkOTP, resetPassword, axiosAuth }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ role, user, accessToken, signup, login, logout, forgotPassword, checkOTP, resetPassword, axiosAuth }}>{children}</AuthContext.Provider>;
 };

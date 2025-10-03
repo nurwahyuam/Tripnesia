@@ -1,15 +1,18 @@
+import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-// import dari hook, bukan dari Context langsung
-import { useAuth } from "../hooks/useAuth";  
+import { AuthContext } from "../context/AuthContext";
 
 const ProtectedRoute = ({ allowedRoles }) => {
-  const { user } = useAuth();
+  const { role, user, loading } = useContext(AuthContext);
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (loading) return <div>Loading...</div>;
 
-  // cek role
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return user.role === "admin" ? (
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return role === "admin" ? (
       <Navigate to="/admin/dashboard" replace />
     ) : (
       <Navigate to="/customer/dashboard" replace />
