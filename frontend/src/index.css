@@ -21,10 +21,14 @@ html {
   scroll-behavior: smooth;
 }
 
-.text-primary {
+.text-primary, .text-primary-hover:hover {
   color: #29D9C2; 
 }
 
-.bg-primary {
+.bg-primary, .bg-primary-hover:hover {
   background-color: #29D9C2 
+}
+
+.border-primary, .border-primary-hover:hover  {
+  border-color: #29D9C2
 }

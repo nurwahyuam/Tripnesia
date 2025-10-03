@@ -1,5 +1,6 @@
 // AboutUs.js
 import React from 'react';
+import Navbar from '../../components/Navbar';
 
 const AboutUs = () => {
   const steps = [
@@ -23,34 +24,7 @@ const AboutUs = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-2xl font-bold text-blue-600">TripNesia</div>
-            
-            <nav className="flex flex-wrap items-center gap-6 md:gap-8 justify-center">
-              <a href="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                Book & Boat
-              </a>
-              <a href="/about" className="text-blue-600 font-medium transition-colors">
-                About Us
-              </a>
-              <a href="#support" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                Support
-              </a>
-              <div className="text-gray-500 text-sm">IDR - Rp</div>
-              <div className="flex gap-3">
-                <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors font-medium">
-                  Sign Up
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                  Sign In
-                </button>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navbar/>
 
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
