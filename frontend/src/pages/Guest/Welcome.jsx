@@ -1,6 +1,7 @@
 // App.js
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
+import BgHeader from "../../assets/Header.png";
 
 const Welcome = () => {
   const [tripType, setTripType] = useState("Open Trip");
@@ -78,60 +79,57 @@ const Welcome = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section
-        className="bg-cover bg-center bg-no-repeat py-20 md:py-28"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://images.unsplash.com/photo-1536152470836-b943b246224c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)",
-        }}
-      >
+      <section className="bg-cover bg-bottom bg-no-repeat py-32 md:py-36" style={{ backgroundImage: `url(${BgHeader})` }}>
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Relax Your Way Through Raja Ampat</h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">Feel the comfort of exploring the stunning financial paradise.</p>
+          <div className="max-w-3xl text-left text-white">
+            <h1 className="text-4xl md:text-5xl mb-6">
+              Relax Your Way Through <br /> Raja Ampat
+            </h1>
+            <p className="text-xl md:text-2xl font-extralight mb-16 opacity-90">Feel the comfort of exploring the stunning financial paradise.</p>
 
-            {/* Trip Type Selector */}
-            <div className="flex justify-center gap-4 mb-8">
-              <button
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${tripType === "Open Trip" ? "bg-blue-600 text-white" : "bg-white bg-opacity-20 text-white hover:bg-opacity-30"}`}
-                onClick={() => setTripType("Open Trip")}
-              >
-                Open Trip
-              </button>
-              <button
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${tripType === "Private Trip" ? "bg-blue-600 text-white" : "bg-white bg-opacity-20 text-white hover:bg-opacity-30"}`}
-                onClick={() => setTripType("Private Trip")}
-              >
-                Private Trip
-              </button>
-            </div>
+            <div className="relative">
+              {/* Trip Type Selector */}
+              <div className="absolute -top-8 left-5 q flex justify-center gap-2 mb-8 p-2 bg-white rounded-full shadow-md">
+                <button
+                  className={`px-6 py-3 rounded-full font-medium transition-colors ${tripType === "Open Trip" ? "bg-[#01A2A61F] text-primary" : "bg-white bg-opacity-20 text-gray-500 hover:bg-opacity-30"}`}
+                  onClick={() => setTripType("Open Trip")}
+                >
+                  Open Trip
+                </button>
+                <button
+                  className={`px-6 py-3 rounded-full font-medium transition-colors ${tripType === "Private Trip" ? "bg-[#01A2A61F] text-primary" : "bg-white bg-opacity-20 text-gray-500 hover:bg-opacity-30"}`}
+                  onClick={() => setTripType("Private Trip")}
+                >
+                  Private Trip
+                </button>
+              </div>
 
-            {/* Search Form */}
-            <div className="bg-white bg-opacity-90 rounded-xl p-6 md:p-8 shadow-lg">
-              <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-end">
-                <div className="flex-1">
-                  <label className="block text-gray-700 text-sm font-medium mb-2 text-left">Date</label>
-                  <input
-                    type="text"
-                    value="19 September 2025 - 03 October 2025"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-                    readOnly
-                  />
-                </div>
-
-                <div className="w-full md:w-auto">
-                  <label className="block text-gray-700 text-sm font-medium mb-2 text-left">Passengers</label>
-                  <div className="flex items-center border border-gray-300 rounded-lg px-4 py-3 bg-white">
-                    <button className="text-blue-600 hover:text-blue-700 text-xl font-bold w-8 h-8 flex items-center justify-center" onClick={() => setPassengerCount(Math.max(1, passengerCount - 1))}>
-                      -
-                    </button>
-                    <span className="mx-4 text-gray-700 font-medium min-w-8 text-center">{passengerCount}</span>
-                    <button className="text-blue-600 hover:text-blue-700 text-xl font-bold w-8 h-8 flex items-center justify-center" onClick={() => setPassengerCount(passengerCount + 1)}>
-                      +
-                    </button>
+              {/* Search Form */}
+              <div className="bg-white bg-opacity-90 rounded-2xl md:px-5 md:pt-14 md:pb-5 shadow-lg">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-end">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value="19 September 2025 - 03 October 2025"
+                      className="w-full text-sm px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+                      readOnly
+                    />
                   </div>
-                </div>
 
-                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium w-full md:w-auto">Search</button>
+                  <div className="w-full md:w-auto">
+                    <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1.5 bg-white">
+                      <button className="text-blue-600 hover:text-blue-700 text-xl font-bold w-8 h-8 flex items-center justify-center" onClick={() => setPassengerCount(Math.max(1, passengerCount - 1))}>
+                        -
+                      </button>
+                      <span className="mx-4 text-gray-700 font-medium min-w-8 text-center">{passengerCount}</span>
+                      <button className="text-blue-600 hover:text-blue-700 text-xl font-bold w-8 h-8 flex items-center justify-center" onClick={() => setPassengerCount(passengerCount + 1)}>
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium w-full md:w-auto">Search</button>
+                </div>
               </div>
             </div>
           </div>

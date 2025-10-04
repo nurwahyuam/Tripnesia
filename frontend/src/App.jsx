@@ -11,37 +11,37 @@ import Welcome from "./pages/Guest/Welcome";
 import AboutUs from "./pages/Guest/AboutUs";
 import Support from "./pages/Guest/Support";
 import GuestProduct from "./pages/Guest/Product/Index";
+import { usePageTitle } from "./hooks/usePageTitle";
 
 function App() {
   const { user, role } = useAuth();
+  usePageTitle();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Guest routes */}
-        <Route path="/" element={!user ? <Welcome /> : <Navigate to={`/${role}/dashboard`} replace />} />
-        <Route path="/about-us" element={!user ? <AboutUs /> : <Navigate to={`/${role}/dashboard`} replace />} />
-        <Route path="/support" element={!user ? <Support /> : <Navigate to={`/${role}/dashboard`} replace />} />
-        <Route path="/product" element={!user ? <GuestProduct /> : <Navigate to={`/${role}/dashboard`} replace />} />
+    <Routes>
+      {/* Guest routes */}
+      <Route path="/" element={!user ? <Welcome /> : <Navigate to={`/${role}/dashboard`} replace />} />
+      <Route path="/about-us" element={!user ? <AboutUs /> : <Navigate to={`/${role}/dashboard`} replace />} />
+      <Route path="/support" element={!user ? <Support /> : <Navigate to={`/${role}/dashboard`} replace />} />
+      <Route path="/product" element={!user ? <GuestProduct /> : <Navigate to={`/${role}/dashboard`} replace />} />
 
-        <Route path="/login" element={!user ? <SignIn /> : <Navigate to={`/${role}/dashboard`} replace />} />
-        <Route path="/register" element={!user ? <SignUp /> : <Navigate to={`/${role}/dashboard`} replace />} />
-        <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to={`/${role}/dashboard`} replace />} />
+      <Route path="/login" element={!user ? <SignIn /> : <Navigate to={`/${role}/dashboard`} replace />} />
+      <Route path="/register" element={!user ? <SignUp /> : <Navigate to={`/${role}/dashboard`} replace />} />
+      <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to={`/${role}/dashboard`} replace />} />
 
-        {/* Customer Protected */}
-        <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
-          <Route path="/customer/dashboard" element={<UserDashboard />} />
-        </Route>
+      {/* Customer Protected */}
+      <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
+        <Route path="/customer/dashboard" element={<UserDashboard />} />
+      </Route>
 
-        {/* Admin Protected */}
-        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        </Route>
+      {/* Admin Protected */}
+      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      </Route>
 
-        {/* Default route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+      {/* Default route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

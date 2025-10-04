@@ -1,5 +1,6 @@
 import React from "react";
 import { useLogout } from "../../hooks/useLogout";
+import Navbar from "../../components/Navbar";
 
 const Dashboard = () => {
   const { handleLogout } = useLogout();
@@ -7,6 +8,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <Navbar />
       <div>Dashboard User</div>
       <button 
         onClick={handleLogout} 
