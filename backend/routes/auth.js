@@ -10,8 +10,6 @@ const {
   getMe
 } = require("../controller/authController");
 
-const { verifyToken } = require("../middleware/authMiddleware");
-
 const router = express.Router();
 
 // SIGNUP (customer, admin, driver dll -> role dikirim di body)

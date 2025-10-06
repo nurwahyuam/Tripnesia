@@ -16,13 +16,14 @@ app.use(cookieParser());
 // CORS (frontend vite di localhost:5173)
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5175",
     credentials: true,
   })
 );
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 // Database & Server
 const startServer = async () => {

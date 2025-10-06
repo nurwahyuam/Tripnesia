@@ -1,17 +1,24 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { usePageTitle } from "./hooks/usePageTitle";
+import { useAuth } from "./hooks/useAuth";
 
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import UserDashboard from "./pages/User/Dashboard";
-import AdminDashboard from "./pages/Admin/Dashboard";
-import { useAuth } from "./hooks/useAuth";
 import Welcome from "./pages/Guest/Welcome";
 import AboutUs from "./pages/Guest/AboutUs";
 import Support from "./pages/Guest/Support";
 import GuestProduct from "./pages/Guest/Product/Index";
-import { usePageTitle } from "./hooks/usePageTitle";
+
+import AdminDashboard from "./pages/Admin/Dashboard";
+import AdminUsers from "./pages/Admin/Users";
+import AdminShips from "./pages/Admin/Ships";
+import AdminCabins from "./pages/Admin/Cabins";
+import AdminBookings from "./pages/Admin/Bookings";
+import AdminTransactions from "./pages/Admin/Transactions";
+import AdminPromos from "./pages/Admin/Promos";
 
 function App() {
   const { user, role } = useAuth();
@@ -37,6 +44,12 @@ function App() {
       {/* Admin Protected */}
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/ships" element={<AdminShips />} />
+        <Route path="/admin/cabins" element={<AdminCabins />} />
+        <Route path="/admin/bookings" element={<AdminBookings />} />
+        <Route path="/admin/transactions" element={<AdminTransactions />} />
+        <Route path="/admin/promos" element={<AdminPromos />} />
       </Route>
 
       {/* Default route */}

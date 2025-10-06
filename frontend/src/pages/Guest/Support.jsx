@@ -1,6 +1,6 @@
 // SupportPage.js
-import React, { useState } from 'react';
-import Navbar from '../../components/Navbar';
+import React, { useState } from "react";
+import GuestLayout from "../../layouts/GuestLayout";
 
 const Support = () => {
   const [activeStep, setActiveStep] = useState(null);
@@ -11,57 +11,57 @@ const Support = () => {
       title: "Step Booking",
       description: "Start a new story",
       content: "Add a book to the group and add a book from the group. Complete the booking process by selecting your preferred dates and making payment.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 2,
       title: "Payment Process",
       description: "Secure payment methods",
       content: "Choose from various payment options including credit card, bank transfer, or digital wallets. All transactions are encrypted and secure.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 3,
       title: "Trip Preparation",
       description: "Get ready for your journey",
       content: "Receive your booking confirmation, travel documents, and preparation guide. Our team will assist with any special requirements.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 4,
       title: "During Your Trip",
       description: "24/7 support available",
       content: "Access our support team anytime during your trip. We're here to ensure your experience is smooth and memorable.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 5,
       title: "Post-Trip Support",
       description: "Share your experience",
       content: "Provide feedback about your trip and share your stories. We value your input to improve our services.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 6,
       title: "Cancellation Policy",
       description: "Flexible cancellation options",
       content: "Understand our cancellation terms and conditions. We offer flexible options with transparent policies.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 7,
       title: "Group Bookings",
       description: "Special group arrangements",
       content: "Planning for a group? We offer special rates and customized itineraries for group bookings.",
-      buttonText: "Submit →"
+      buttonText: "Submit →",
     },
     {
       id: 8,
       title: "Special Requests",
       description: "Customize your experience",
       content: "Have special requirements? Let us know and we'll do our best to accommodate your needs.",
-      buttonText: "Submit →"
-    }
+      buttonText: "Submit →",
+    },
   ];
 
   const contactMethods = [
@@ -73,7 +73,7 @@ const Support = () => {
       ),
       title: "Create",
       description: "Send us an email for general inquiries",
-      action: "Email Support"
+      action: "Email Support",
     },
     {
       icon: (
@@ -83,7 +83,7 @@ const Support = () => {
       ),
       title: "Make Pending Manual",
       description: "Check pending requests status",
-      action: "Check Status"
+      action: "Check Status",
     },
     {
       icon: (
@@ -93,7 +93,7 @@ const Support = () => {
       ),
       title: "Pending Data",
       description: "Review and update your information",
-      action: "Update Data"
+      action: "Update Data",
     },
     {
       icon: (
@@ -103,7 +103,7 @@ const Support = () => {
       ),
       title: "Apply URLs",
       description: "Access important links and resources",
-      action: "View Links"
+      action: "View Links",
     },
     {
       icon: (
@@ -113,24 +113,17 @@ const Support = () => {
       ),
       title: "Subscribe",
       description: "Get updates and promotions",
-      action: "Subscribe Now"
-    }
+      action: "Subscribe Now",
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <Navbar />
-
+    <GuestLayout>
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Welcome to the Help Center
-          </h1>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto">
-            Find answers to your questions and get the support you need for your Raja Ampat adventure.
-          </p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Welcome to the Help Center</h1>
+          <p className="text-xl opacity-90 max-w-2xl mx-auto">Find answers to your questions and get the support you need for your Raja Ampat adventure.</p>
         </div>
       </section>
 
@@ -142,38 +135,24 @@ const Support = () => {
             <h2 className="text-3xl font-bold text-gray-800 mb-8">Booking Steps & Guides</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {steps.map((step) => (
-                <div 
-                  key={step.id}
-                  className="bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div 
-                    className="p-6 cursor-pointer"
-                    onClick={() => setActiveStep(activeStep === step.id ? null : step.id)}
-                  >
+                <div key={step.id} className="bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                  <div className="p-6 cursor-pointer" onClick={() => setActiveStep(activeStep === step.id ? null : step.id)}>
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                          {step.title}
-                        </h3>
-                        <p className="text-blue-600 font-medium mb-3">
-                          {step.description}
-                        </p>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">{step.title}</h3>
+                        <p className="text-blue-600 font-medium mb-3">{step.description}</p>
                       </div>
-                      <div className={`transform transition-transform ${activeStep === step.id ? 'rotate-180' : ''}`}>
+                      <div className={`transform transition-transform ${activeStep === step.id ? "rotate-180" : ""}`}>
                         <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
                     </div>
-                    
+
                     {activeStep === step.id && (
                       <div className="mt-4 animate-fade-in">
-                        <p className="text-gray-600 mb-4 leading-relaxed">
-                          {step.content}
-                        </p>
-                        <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                          {step.buttonText}
-                        </button>
+                        <p className="text-gray-600 mb-4 leading-relaxed">{step.content}</p>
+                        <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">{step.buttonText}</button>
                       </div>
                     )}
                   </div>
@@ -190,15 +169,11 @@ const Support = () => {
               <div className="space-y-4">
                 {contactMethods.map((method, index) => (
                   <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
-                      {method.icon}
-                    </div>
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">{method.icon}</div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-800 mb-1">{method.title}</h4>
                       <p className="text-gray-600 text-sm mb-2">{method.description}</p>
-                      <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                        {method.action}
-                      </button>
+                      <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">{method.action}</button>
                     </div>
                   </div>
                 ))}
@@ -209,24 +184,20 @@ const Support = () => {
             <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
               <h3 className="text-2xl font-bold text-gray-800 mb-4">Head Office</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Our Services team is responsible for ensuring that all our customers receive the highest level of support. 
-                We are committed to providing comprehensive assistance throughout your journey with us.
+                Our Services team is responsible for ensuring that all our customers receive the highest level of support. We are committed to providing comprehensive assistance throughout your journey with us.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                We continuously work to improve our services and ensure that our business operations are fully compliant 
-                with industry standards. Our dedicated team is here to support you every step of the way.
+                We continuously work to improve our services and ensure that our business operations are fully compliant with industry standards. Our dedicated team is here to support you every step of the way.
               </p>
             </div>
 
             {/* TripNesia Info */}
             <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl shadow-md p-6 text-white">
               <h3 className="text-2xl font-bold mb-4">TripNesia</h3>
-              <p className="leading-relaxed mb-4">
-                Start your own story with us. Follow our journey and explore more about our services on our website.
-              </p>
-              <a 
-                href="https://www.tripnesia.com/about-trip-nesia-types.html" 
-                target="_blank" 
+              <p className="leading-relaxed mb-4">Start your own story with us. Follow our journey and explore more about our services on our website.</p>
+              <a
+                href="https://www.tripnesia.com/about-trip-nesia-types.html"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-medium"
               >
@@ -262,27 +233,25 @@ const Support = () => {
       {/* FAQ Section */}
       <section className="bg-gray-100 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            Frequently Asked Questions
-          </h2>
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
               {
                 question: "How far in advance should I book my trip?",
-                answer: "We recommend booking at least 2-3 months in advance, especially for peak season."
+                answer: "We recommend booking at least 2-3 months in advance, especially for peak season.",
               },
               {
                 question: "What is your cancellation policy?",
-                answer: "We offer flexible cancellation with full refund up to 30 days before the trip."
+                answer: "We offer flexible cancellation with full refund up to 30 days before the trip.",
               },
               {
                 question: "Do you provide travel insurance?",
-                answer: "Yes, we offer comprehensive travel insurance options for all our packages."
+                answer: "Yes, we offer comprehensive travel insurance options for all our packages.",
               },
               {
                 question: "What should I pack for Raja Ampat?",
-                answer: "Light clothing, swimwear, sunscreen, and underwater camera are essential."
-              }
+                answer: "Light clothing, swimwear, sunscreen, and underwater camera are essential.",
+              },
             ].map((faq, index) => (
               <div key={index} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <h3 className="font-semibold text-gray-800 mb-3">{faq.question}</h3>
@@ -292,38 +261,7 @@ const Support = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0">
-              <div className="text-2xl font-bold text-white mb-4">TripNesia</div>
-              <div className="flex space-x-4">
-                <button className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors">
-                  <span className="text-sm font-bold">f</span>
-                </button>
-                <button className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors">
-                  <span className="text-sm font-bold">t</span>
-                </button>
-                <button className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors">
-                  <span className="text-sm font-bold">in</span>
-                </button>
-              </div>
-            </div>
-            
-            <div className="text-center md:text-right">
-              <p className="text-gray-400 mb-2">
-                &copy; 2024 TripNesia. All rights reserved.
-              </p>
-              <p className="text-gray-400">
-                24/7 Support Available
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </GuestLayout>
   );
 };
 

@@ -1,6 +1,9 @@
 import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import CustomerLayout from "../layouts/CustomerLayout";
+import AdminLayout from "../layouts/AdminLayout";
+import GuestLayout from "../layouts/GuestLayout";
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const { role, user, loading } = useContext(AuthContext);
@@ -12,14 +15,22 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {
-    return role === "admin" ? (
-      <Navigate to="/admin/dashboard" replace />
-    ) : (
-      <Navigate to="/customer/dashboard" replace />
-    );
+    return role === "admin" ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/customer/dashboard" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      {role === "admin" ? (
+        <AdminLayout>
+          <Outlet />
+        </AdminLayout>
+      ) : (
+        <CustomerLayout>
+          <Outlet />
+        </CustomerLayout>
+      )}
+    </>
+  );
 };
 
 export default ProtectedRoute;

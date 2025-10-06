@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const GuestLayout = ({children}) => {
+const CustomerLayout = ({children}) => {
   return (
     <div>
       <Navbar />
@@ -12,4 +12,4 @@ const GuestLayout = ({children}) => {
   );
 };
 
-export default GuestLayout;
+export default CustomerLayout;
