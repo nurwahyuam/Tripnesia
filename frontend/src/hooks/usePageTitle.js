@@ -18,7 +18,14 @@
       else if (path === "/register") pageTitle = "Register";
       else if (path === "/forgot-password") pageTitle = "Forgot Password";
       else if (path.startsWith("/customer/dashboard")) pageTitle = "Customer Dashboard";
-      else if (path.startsWith("/admin/dashboard")) pageTitle = "Admin Dashboard";
+
+      else if (path.startsWith("/admin/dashboard")) pageTitle = "Admin Dashboard"
+      else if (path.startsWith("/admin/users")) pageTitle = "Users Management";
+      else if (path.startsWith("/admin/ships")) pageTitle = "Ships Management"
+      else if (path.startsWith("/admin/cabins")) pageTitle = "Cabins Management"
+      else if (path.startsWith("/admin/bookings")) pageTitle = "Bookings Management";
+      else if (path.startsWith("/admin/transactions")) pageTitle = "Transactions Management";
+      else if (path.startsWith("/admin/promos")) pageTitle = "Promos Management";
 
       document.title = `${pageTitle} | ${appName}`;
     }, [location, appName]);
