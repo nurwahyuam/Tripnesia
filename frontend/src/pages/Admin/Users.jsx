@@ -88,7 +88,6 @@ const Users = () => {
   const handleDeleteConfirm = async () => {
     try {
       await deleteUser(selectedUser._id);
-      console.log("Deleting user ID:", selectedUser._id);
       closeDeleteModal();
       setCurrentPage(1);
     } catch {

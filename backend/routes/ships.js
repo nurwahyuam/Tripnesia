@@ -1,23 +1,19 @@
 const express = require("express");
 const {
-  getUsers,
-  getUser,
-  updateUser,
-  deleteUser,
-  createUser
-} = require("../controller/userController");
+
+} = require("../controller/shipController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // GET ALL USERS (admin only)
-router.get("/", verifyToken, getUsers);
+router.get("/", verifyToken, getShips);
 // CREATE USER (admin only)
-router.post("/", verifyToken, createUser);
+router.post("/", verifyToken, createShip);
 // UPDATE USER (admin only)
-router.put("/:id", verifyToken, updateUser);
+router.put("/:id", verifyToken, updateShip);
 // DELETE USER (admin only)
-router.delete("/:id", verifyToken, deleteUser);
+router.delete("/:id", verifyToken, deleteShip);
 
 module.exports = router;

@@ -12,7 +12,10 @@ const verifyToken = (req, res, next) => {
   if (!token) return res.status(401).json({ error: "Token tidak ditemukan" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.sendStatus(403).json({ error: "Token tidak valid atau expired" });
+    if (err) {
+      console.error("❌ JWT verification failed:", err.message);
+      return res.status(403).json({ error: "Token tidak valid atau expired" });
+    }
     req.user = decoded;
     next();
   });
