@@ -13,7 +13,7 @@ const planDaysSchema = new mongoose.Schema({
     min: 1,
   },
   plans: {
-    type: Object, // bisa jadi array of objects, sesuaikan struktur
+    type: mongoose.Schema.Types.Mixed,
     required: true,
   },
 }, {

@@ -4,7 +4,7 @@ import { useUsers } from "../../hooks/useUsers";
 import { usePagination } from "../../hooks/usePagination";
 import Pagination from "../../components/Pagination";
 import Table from "../../components/Table";
-import AllUsers from "../../assets/icons/All-Users.svg";
+import AllUsers from "../../assets/icons/Users.svg";
 import Modal from "../../components/Modal";
 import InputField from "../../components/InputField";
 
