@@ -28,10 +28,12 @@ const Users = () => {
   // === Modal & Form Handlers (sama seperti sebelumnya) ===
   const getInitials = (name) =>
     name
+      .trim() // hapus spasi berlebih di awal/akhir
       .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+      .filter(Boolean) // hapus elemen kosong (spasi ganda)
+      .slice(0, 2) // ambil maksimal 2 kata pertama
+      .map((n) => n[0].toUpperCase()) // ambil huruf pertama dari tiap kata
+      .join("");
 
   const openCreateModal = () => {
     setFormData({ name: "", email: "", number_telephone: "", password: "1234567890", role: "customer", support: true });

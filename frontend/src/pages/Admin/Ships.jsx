@@ -65,7 +65,6 @@ const Ships = () => {
       specifications: [],
       facilities: [],
       securityTools: [],
-      images: [],
     });
     setIsCreateModalOpen(true);
   };
@@ -314,7 +313,6 @@ const Ships = () => {
     // Append ship data sebagai JSON string
     const shipData = {
       ...formData.ship,
-      // Hapus image_ship karena akan dikirim sebagai file
       image_ship: undefined,
     };
     formDataToSend.append("ship", JSON.stringify(shipData));
@@ -327,9 +325,6 @@ const Ships = () => {
 
     // Append FILEs
     formDataToSend.append("masterImage", masterImageFile);
-    additionalImageFiles.forEach((file) => {
-      if (file) formDataToSend.append("additionalImages", file);
-    });
 
     console.log(formDataToSend);
 
@@ -553,27 +548,6 @@ const Ships = () => {
                   <img src={formData.ship.image_ship} alt="Master preview" className="w-24 h-24 object-cover rounded border" />
                 </div>
               )}
-            </div>
-
-            {/* ADDITIONAL IMAGES */}
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Additional Images</h3>
-              {formData.images.map((base64, index) => (
-                <div key={index} className="flex flex-col gap-2 mb-4 p-3 border border-gray-200 rounded">
-                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, false, index)} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
-                  {base64 && (
-                    <div className="mt-2">
-                      <img src={base64} alt={`Preview ${index + 1}`} className="w-20 h-20 object-cover rounded border" />
-                    </div>
-                  )}
-                  <button type="button" onClick={() => handleRemoveImage(index)} className="self-start px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <button type="button" onClick={handleAddImage} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                + Add Image
-              </button>
             </div>
 
             {/* PACKAGE & UNPACKAGE */}

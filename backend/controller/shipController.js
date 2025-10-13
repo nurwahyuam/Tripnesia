@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require('fs');
 const path = require("path");
 const Ship = require("../models/shipModel");
 const Schedule = require("../models/scheduleModel");
@@ -92,6 +92,7 @@ const getShipById = async (req, res) => {
 
 const createShip = async (req, res) => {
   let session;
+  let committed = false;
   try {
     session = await Ship.startSession();
     session.startTransaction();
@@ -154,10 +155,6 @@ const createShip = async (req, res) => {
     await newShip.save(options);
     const shipId = newShip._id;
 
-    // --- PROSES ADDITIONAL IMAGES ---
-    const additionalImageFiles = req.files?.filter((file) => file.fieldname === "additionalImages") || [];
-    const additionalImagePaths = additionalImageFiles.map((file) => `/uploads/ship/${file.filename}`);
-
     // Simpan Schedule & PlanDays
     const savedSchedules = [];
     for (const sched of schedules) {
@@ -213,17 +210,9 @@ const createShip = async (req, res) => {
       await toolDoc.save(options);
     }
 
-    // Simpan Additional Images
-    for (const imgPath of additionalImagePaths) {
-      const imgDoc = new ImagesShip({
-        ship_id: shipId,
-        image_ship_url: imgPath,
-      });
-      await imgDoc.save(options);
-    }
-
     if (session) {
       await session.commitTransaction();
+      committed = true;
       session.endSession();
     }
 
@@ -232,22 +221,19 @@ const createShip = async (req, res) => {
     const shipResponse = {
       ...shipWithSlug.toObject(),
       image_ship: baseUrl + shipWithSlug.image_ship,
-      images: shipWithSlug.images.map((img) => ({
-        ...img,
-        image_ship_url: baseUrl + img.image_ship_url,
-      })),
     };
 
     res.status(201).json({
       message: "Ship and all related data created successfully",
-      ship: shipResponse, // ✅ kirim shipResponse, bukan shipWithSlug
+      ship: shipResponse,
     });
   } catch (error) {
-    if (session) {
+    if (session && !committed) {
       await session.abortTransaction();
+    }
+    if (session) {
       session.endSession();
     }
-    // Hapus file yang sudah terupload jika error
     if (req.files) {
       Object.values(req.files)
         .flat()
@@ -266,6 +252,7 @@ const updateShip = async (req, res) => {
   const { id } = req.params;
 
   let session;
+  let committed = false;
   try {
     session = await Ship.startSession();
     session.startTransaction();
@@ -400,7 +387,7 @@ const updateShip = async (req, res) => {
     }
 
     // --- PROSES ADDITIONAL IMAGES BARU ---
-    const additionalImageFiles = req.files?.filter((file) => file.fieldname === "additionalImages") || [];
+    const additionalImageFiles = Array.isArray(req.files) ? req.files.filter((file) => file.fieldname === "additionalImages") : [];
     const additionalImagePaths = additionalImageFiles.map((file) => `/uploads/ship/${file.filename}`);
 
     // Simpan Additional Images
@@ -414,6 +401,7 @@ const updateShip = async (req, res) => {
 
     if (session) {
       await session.commitTransaction();
+      committed = true;
       session.endSession();
     }
 
@@ -422,7 +410,7 @@ const updateShip = async (req, res) => {
     const shipResponse = {
       ...shipWithSlug.toObject(),
       image_ship: baseUrl + shipWithSlug.image_ship,
-      images: shipWithSlug.images.map((img) => ({
+      images: (shipWithSlug.images || []).map((img) => ({
         ...img,
         image_ship_url: baseUrl + img.image_ship_url,
       })),
@@ -430,23 +418,25 @@ const updateShip = async (req, res) => {
 
     res.status(200).json({
       message: "Ship and all related data updated successfully",
-      ship: shipResponse, // ✅ kirim shipResponse
+      ship: shipResponse,
     });
   } catch (error) {
-    if (session) {
+    if (session && !committed) {
       await session.abortTransaction();
+    }
+    if (session) {
       session.endSession();
     }
-    // Hapus file baru yang gagal disimpan
+
+    // Hapus file yang gagal disimpan
     if (req.files) {
-      Object.values(req.files)
-        .flat()
-        .forEach((file) => {
-          if (fs.existsSync(file.path)) {
-            fs.unlinkSync(file.path);
-          }
-        });
+      req.files.forEach((file) => {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      });
     }
+
     console.error("Update full ship error:", error);
     res.status(500).json({ message: error.message || "Failed to update ship" });
   }
@@ -454,13 +444,40 @@ const updateShip = async (req, res) => {
 
 const deleteShip = async (req, res) => {
   const { id } = req.params;
-  try {
-    const ship = await Ship.findById(id);
-    if (!ship) return res.status(404).json({ message: "Ship not found" });
 
+  try {
+    // 1. Cari ship untuk validasi & ambil path gambar
+    const ship = await Ship.findById(id);
+    if (!ship) {
+      return res.status(404).json({ message: "Ship not found" });
+    }
+
+    // 2. Ambil semua schedule terkait untuk hapus PlanDays
     const schedules = await Schedule.find({ ship_id: id });
     const scheduleIds = schedules.map((s) => s._id);
 
+    // 3. Ambil semua additional images untuk hapus file fisik
+    const additionalImages = await ImagesShip.find({ ship_id: id });
+
+    // 4. Hapus file fisik (master image)
+    if (ship.image_ship) {
+      const masterImagePath = path.join(__dirname, "..", ship.image_ship);
+      if (fs.existsSync(masterImagePath)) {
+        fs.unlinkSync(masterImagePath);
+      }
+    }
+
+    // 5. Hapus file fisik (additional images)
+    for (const img of additionalImages) {
+      if (img.image_ship_url) {
+        const imgPath = path.join(__dirname, "..", img.image_ship_url);
+        if (fs.existsSync(imgPath)) {
+          fs.unlinkSync(imgPath);
+        }
+      }
+    }
+
+    // 6. Hapus semua dokumen terkait di database
     await Promise.all([
       Schedule.deleteMany({ ship_id: id }),
       PlanDays.deleteMany({ plan_id: { $in: scheduleIds } }),
@@ -468,13 +485,13 @@ const deleteShip = async (req, res) => {
       FacilityShip.deleteMany({ ship_id: id }),
       SecurityToolShip.deleteMany({ ship_id: id }),
       ImagesShip.deleteMany({ ship_id: id }),
+      Ship.findByIdAndDelete(id), // Hapus ship terakhir
     ]);
 
-    await Ship.findByIdAndDelete(id);
-    res.status(200).json({ message: "Ship deleted successfully" });
+    res.status(200).json({ message: "Ship and all related data deleted successfully" });
   } catch (err) {
     console.error("Delete ship error:", err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message || "Failed to delete ship" });
   }
 };
 

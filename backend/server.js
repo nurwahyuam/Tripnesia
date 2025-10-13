@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const shipRoutes = require("./routes/ships");
+const promoRoutes = require("./routes/promos");
 
 const app = express();
 
@@ -28,14 +29,12 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ships", shipRoutes);
+app.use("/api/promos", promoRoutes);
 
 // Database & Server
 const startServer = async () => {
   try {
-    await mongoose.connect(process.env.MONG_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONG_URL);
     const port = process.env.PORT || 4000;
     app.listen(port, () => {
       console.log(`✅ Server running on http://localhost:${port}`);

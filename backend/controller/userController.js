@@ -15,7 +15,6 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
   try {
     const { name, email, password, number_telephone, role, support } = req.body;
-    console.log(req.body);
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: "Semua Input harus wajib diisi." });
     }
