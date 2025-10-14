@@ -2,7 +2,7 @@ const express = require("express");
 const { getShips, getShipById, createShip, updateShip, deleteShip } = require("../controller/shipController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploudMiddleware");
+const upload = require("../middleware/uploudShipMiddleware");
 
 const router = express.Router();
 
@@ -10,18 +10,8 @@ const router = express.Router();
 router.get("/", verifyToken, getShips);
 // GET SINGLE USER (admin only)
 router.get("/:id", verifyToken, getShipById);
-router.post(
-  "/",
-  verifyToken,
-  upload.any(),
-  createShip
-);
-router.put(
-  "/:id",
-  verifyToken,
-  upload.any(),
-  updateShip
-);
+router.post("/", verifyToken, upload.any(), createShip);
+router.put("/:id", verifyToken, upload.any(), updateShip);
 // DELETE USER (admin only)
 router.delete("/:id", verifyToken, deleteShip);
 

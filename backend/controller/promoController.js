@@ -15,27 +15,50 @@ const getPromos = async (req, res) => {
 const createPromo = async (req, res) => {
   try {
     const { code, description, price, percentage, start_date, end_date, status } = req.body;
-    if (!code || !description || !price || !percentage || !start_date || end_date || !status) {
-      return res.status(400).json({ message: "Semua Input harus wajib diisi." });
+
+    // Validasi wajib
+    if (!code || !description || !start_date || !end_date || status === undefined) {
+      return res.status(400).json({ message: "Wajib isi Kode, Deksripsi, Mulai Tanggal, Sampai Tanggal, dan Status." });
     }
-    const existingPromo = await Promo.findOne({ $or: [{ code }] });
+
+    // Validasi format tanggal
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ message: "Format tanggal tidak valid." });
+    }
+    if (endDate <= startDate) {
+      return res.status(400).json({ message: "Tanggal berakhir harus setelah tanggal mulai." });
+    }
+
+    // Cek duplikat kode
+    const existingPromo = await Promo.findOne({ code });
     if (existingPromo) {
-      return res.status(400).json({ message: "Kode sudah dibuat." });
+      return res.status(400).json({ message: "Kode promo sudah ada." });
     }
+
+    // Di createPromo & updatePromo:
+    const safeNumber = (val) => {
+      if (val == null || val === "") return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    };
 
     const newPromo = new Promo({
       code,
       description,
-      price,
-      percentage,
-      start_date,
-      end_date,
-      status
+      price: safeNumber(price),
+      percentage: safeNumber(percentage),
+      start_date: startDate,
+      end_date: endDate,
+      status: Boolean(status),
     });
+
     await newPromo.save();
-    res.status(201).json({ message: "Promo telah berhasil dibuat" });
+    res.status(201).json({ message: "Promo telah berhasil dibuat.", promo: newPromo });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Kesalahan server internal." });
   }
 };
 // UPDATE PROMO
@@ -44,10 +67,17 @@ const updatePromo = async (req, res) => {
     const { code, description, price, percentage, start_date, end_date, status } = req.body;
     const promo = await Promo.findById(req.params.id);
     if (!promo) return res.status(404).json({ message: "Promo tidak ditemukan." });
+
+    const safeNumber = (val) => {
+      if (val == null || val === "") return undefined;
+      const num = Number(val);
+      return isNaN(num) ? undefined : num;
+    };
+
     if (code) promo.code = code;
     if (description) promo.description = description;
-    if (price) promo.price = price;
-    if (percentage) promo.percentage = percentage;
+    if (price) promo.price = safeNumber(price);
+    if (percentage) promo.percentage = safeNumber(percentage);
     if (status) promo.status = status;
     if (start_date) promo.start_date = start_date;
     if (end_date) promo.end_date = end_date;
@@ -66,9 +96,9 @@ const deletePromo = async (req, res) => {
     }
     const promo = await Promo.findByIdAndDelete(id);
     if (!promo) {
-      return res.status(404).json({ error: 'Promo tidak ditemukan' });
+      return res.status(404).json({ error: "Promo tidak ditemukan" });
     }
-    res.status(200).json({ message: 'Pengguna Berhasil Dihapus!' });
+    res.status(200).json({ message: "Pengguna Berhasil Dihapus!" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

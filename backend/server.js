@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const shipRoutes = require("./routes/ships");
 const promoRoutes = require("./routes/promos");
+const cabinRoutes = require("./routes/cabins");
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(cookieParser());
 // CORS (frontend vite di localhost:5173)
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
     credentials: true,
   })
 );
@@ -30,6 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ships", shipRoutes);
 app.use("/api/promos", promoRoutes);
+app.use("/api/cabins", cabinRoutes);
 
 // Database & Server
 const startServer = async () => {

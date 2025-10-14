@@ -1,4 +1,3 @@
-// src/models/FacilityShip.js
 const mongoose = require('mongoose');
 
 const facilitySchema = new mongoose.Schema({

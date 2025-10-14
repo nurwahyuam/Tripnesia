@@ -698,7 +698,7 @@ const Ships = () => {
             </div>
           </form>
         </Modal>
-      )}
+      )}  
 
       {/* EDIT MODAL */}
       {isEditModalOpen && selectedShip && (

@@ -14,11 +14,14 @@ const promoSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: true,
+      min: 0,
+      required: false,
     },
     percentage: {
       type: Number,
-      required: true,
+      min: 0,
+      max: 100,
+      required: false,
     },
     start_date: {
       type: Date,
