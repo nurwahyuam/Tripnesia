@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import BgAuth from "../assets/Bg-Auth.png";
+import BgAuth from "../assets/Bg-Auth.webp";
 import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
 import { useForgotPassword } from "../hooks/useForgotPassword";
@@ -122,7 +122,9 @@ const ForgotPassword = () => {
     <div className="flex min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${BgAuth})` }}>
       {/* Left Content */}
       <div className="flex-1 flex-col flex justify-center pl-64 text-white bg-black/15">
+        <Link to={"/"}>
         <ApplicationLogo className="-ml-2" width={250} />
+        </Link>
         <h1 className="text-4xl font-semibold mt-16">Start Your Adventure</h1>
         <p className="text-sm mt-4">Log in and prepare your screen for your journey.</p>
       </div>

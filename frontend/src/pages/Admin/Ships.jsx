@@ -326,8 +326,6 @@ const Ships = () => {
     // Append FILEs
     formDataToSend.append("masterImage", masterImageFile);
 
-    console.log(formDataToSend);
-
     try {
       await createShip(formDataToSend); // pastikan hook terima FormData
       closeCreateModal();

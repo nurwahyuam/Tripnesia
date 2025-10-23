@@ -1,4 +1,3 @@
-// BoatRentalPage.js
 import React, { useState } from "react";
 import GuestLayout from "../../../layouts/GuestLayout";
 

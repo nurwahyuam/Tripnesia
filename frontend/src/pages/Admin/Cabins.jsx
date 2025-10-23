@@ -68,10 +68,10 @@ const Cabins = () => {
       price: cabin.price != null ? String(cabin.price) : "",
     });
     const otherFromCabin = cabin.other && Array.isArray(cabin.other) ? cabin.other.map((item) => ({ key: item.key || "", value: item.value || "" })) : [{ key: "", value: "" }];
-    const existingPreviews = (cabin.images || []).map((url) => ({
-      id: url, // gunakan URL sebagai ID
-      url: `${URL_API}${url}`,
-      isExisting: true, // flag untuk bedakan
+    const existingPreviews = (cabin.images || []).map((fullUrl) => ({
+      id: fullUrl,
+      url: fullUrl,
+      isExisting: true,
     }));
     setImagePreviews(existingPreviews);
     setOtherFields(otherFromCabin);

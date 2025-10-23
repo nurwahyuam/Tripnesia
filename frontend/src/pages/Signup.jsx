@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import BgAuth from "../assets/Bg-Auth.png";
+import BgAuth from "../assets/Bg-Auth.webp";
 import ApplicationLogo from "../components/ApplicationLogo";
 import InputForm from "../components/InputForm";
 import { useSignup } from "../hooks/useSignup";
@@ -37,10 +37,12 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${BgAuth})` }}>
+    <div className="flex min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${BgAuth})` }} loading="lazy">
       {/* Left Content */}
       <div className="flex-1 flex-col flex justify-center pl-64 text-white bg-black/15">
-        <ApplicationLogo className="-ml-2" width={250} />
+        <Link to={"/"}>
+          <ApplicationLogo className="-ml-2" width={250} />
+        </Link>
         <h1 className="text-4xl font-semibold mt-16">Start Your Adventure</h1>
         <p className="text-sm mt-4">Sign up and prepare your screen for your journey.</p>
       </div>
@@ -83,11 +85,9 @@ const Signup = () => {
               </label>
             </div>
 
-            <Button 
-              type={"submit"}
-              disabled={loading}
-              className="cursor-pointer"
-            >{loading ? "Loading..." : "Register"}</Button>
+            <Button type={"submit"} disabled={loading} className="cursor-pointer">
+              {loading ? "Loading..." : "Register"}
+            </Button>
           </form>
 
           <p className="text-center mt-2">

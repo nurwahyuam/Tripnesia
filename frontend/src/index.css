@@ -2,9 +2,7 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -21,14 +19,50 @@ html {
   scroll-behavior: smooth;
 }
 
-.text-primary, .text-primary-hover:hover {
-  color: #29D9C2; 
+.text-primary,
+.text-primary-hover:hover {
+  color: #29d9c2;
 }
 
-.bg-primary, .bg-primary-hover:hover {
-  background-color: #29D9C2 
+.bg-primary,
+.bg-primary-hover:hover {
+  background-color: #29d9c2;
 }
 
-.border-primary, .border-primary-hover:hover  {
-  border-color: #29D9C2
+.border-primary,
+.border-primary-hover:hover {
+  border-color: #29d9c2;
+}
+
+/* Sembunyikan scrollbar secara default */
+.trip-slider {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Sembunyikan track scrollbar di WebKit (Chrome, Safari) */
+.trip-slider::-webkit-scrollbar {
+  display: none;
+}
+
+/* Saat hover, tampilkan scrollbar */
+.trip-slider:hover {
+  -ms-overflow-style: auto;
+  scrollbar-width: auto;
+}
+
+.trip-slider:hover::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+.trip-slider:hover::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* gray-300 */
+  border-radius: 4px;
+}
+
+.trip-slider:hover::-webkit-scrollbar-track {
+  background-color: #f1f5f9; /* gray-100 */
 }
