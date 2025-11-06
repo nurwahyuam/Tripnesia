@@ -71,3 +71,35 @@ export const apiFetch = async (endpoint, options = {}) => {
 
   return res.json();
 };
+
+export const apiFetchPublic = async (endpoint, options = {}) => {
+  // Deteksi apakah body adalah FormData
+  const isFormData = options.body instanceof FormData;
+
+  // Header tanpa Authorization
+  const headers = {
+    ...(isFormData
+      ? {}
+      : { "Content-Type": "application/json" }
+    ),
+    ...(options.headers || {}),
+  };
+
+  const res = await fetch(`${URL_API}${endpoint}`, {
+    credentials: "include",
+    headers,
+    ...options,
+  });
+
+  if (!res.ok) {
+    let err = {};
+    try {
+      err = await res.json();
+    } catch {
+      err = {};
+    }
+    throw new Error(err.message || err.error || res.statusText || `API Error: ${res.status}`);
+  }
+
+  return res.json();
+};

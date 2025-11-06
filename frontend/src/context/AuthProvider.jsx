@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
       const decoded = jwtDecode(token);
-      setRole(decoded.role); // ambil role dari token
+      setRole(decoded.role);
     }
   }, []);
 

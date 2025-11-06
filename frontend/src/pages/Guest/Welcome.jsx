@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GuestLayout from "../../layouts/GuestLayout";
 import BgHeader from "../../assets/Bg-Header.png";
 import DateRangePicker from "../../components/DateRangePicker";
@@ -95,6 +95,14 @@ const Welcome = () => {
       isTour: true,
     },
   ];
+
+  useEffect(() => {
+    const shouldReload = sessionStorage.getItem("reloadOnce");
+    if (shouldReload) {
+      sessionStorage.removeItem("reloadOnce");
+      window.location.reload();
+    }
+  }, []);
 
   return (
     <GuestLayout>
@@ -193,7 +201,7 @@ const Welcome = () => {
 
         {/* Card Raja Ampat */}
         <DiscoverRajaAmpatSection />
-        
+
         {/* Explore Our Trip Section */}
         <WhyChooseTripNesia />
       </div>
