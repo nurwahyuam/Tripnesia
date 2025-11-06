@@ -1,12 +1,14 @@
 const fs = require("fs");
 const path = require("path");
 const Ship = require("../models/shipModel");
+const Cabin = require("../models/cabinShipModel");
 const Schedule = require("../models/scheduleModel");
 const PlanDays = require("../models/planDaysModel");
 const SpecificationShip = require("../models/specificationShipModel");
 const FacilityShip = require("../models/facilityShipModel");
 const SecurityToolShip = require("../models/securityToolShip");
 const ImagesShip = require("../models/imageShipModel");
+const ImagesCabin = require("../models/imageCabinModel");
 
 const getShips = async (req, res) => {
   try {
@@ -14,6 +16,144 @@ const getShips = async (req, res) => {
     res.status(200).json(ships);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+const getPublicShips = async (req, res) => {
+  try {
+    const ships = await Ship.find().select("name type merk class min_pax max_pax status slug image_ship createdAt").lean();
+
+    // Ambil semua cabin & schedule berdasarkan ship_id
+    const shipIds = ships.map((s) => s._id);
+    const [cabins, schedules] = await Promise.all([Cabin.find({ ship_id: { $in: shipIds } }).lean(), Schedule.find({ ship_id: { $in: shipIds } }).lean()]);
+
+    const cabinMap = {};
+    const scheduleMap = {};
+
+    cabins.forEach((cabin) => {
+      const id = cabin.ship_id.toString();
+      if (!cabinMap[id]) cabinMap[id] = [];
+      cabinMap[id].push(cabin);
+    });
+
+    schedules.forEach((sched) => {
+      const id = sched.ship_id.toString();
+      if (!scheduleMap[id]) scheduleMap[id] = [];
+      scheduleMap[id].push(sched);
+    });
+
+    // Gabungkan semuanya jadi satu array
+    const shipsData = ships.map((ship) => {
+      const shipId = ship._id.toString();
+      const shipCabins = cabinMap[shipId] || [];
+      const shipSchedules = scheduleMap[shipId] || [];
+
+      // Hitung harga minimum
+      const prices = shipCabins.map((c) => parseFloat(c.price?.replace(/[^0-9]/g, ""))).filter((p) => !isNaN(p));
+
+      const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+
+      return {
+        ...ship,
+        minPrice,
+        cabins: shipCabins,
+        schedules: shipSchedules,
+      };
+    });
+
+    res.json({
+      success: true,
+      data: shipsData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getPublicShipBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // 1. Cari ship berdasarkan slug
+    const ship = await Ship.findOne({ slug }).select("name type merk class min_pax max_pax status slug description image_ship").lean();
+
+    if (!ship) {
+      return res.status(404).json({
+        success: false,
+        message: "Ship not found",
+      });
+    }
+
+    const shipId = ship._id.toString();
+
+    // 2. Ambil semua cabin & schedule berdasarkan ship_id
+    const [cabins, schedules, images, facilities, specifications, tools] = await Promise.all([
+      Cabin.find({ ship_id: shipId }).lean(),
+      Schedule.find({ ship_id: shipId }).lean(),
+      ImagesShip.find({ ship_id: shipId }).lean(),
+      FacilityShip.find({ ship_id: shipId }).lean(),
+      SpecificationShip.find({ ship_id: shipId }).lean(),
+      SecurityToolShip.find({ ship_id: shipId }).lean(),
+    ]);
+
+    let cabinImagesMap = {};
+    if (cabins.length > 0) {
+      const cabinIds = cabins.map((c) => c._id.toString());
+
+      // Ambil semua CabinImage berdasarkan daftar cabin_id
+      const cabinImages = await ImagesCabin.find({ cabin_id: { $in: cabinIds } }).lean();
+
+      // Buat map: cabin_id -> array gambar
+      cabinImagesMap = cabinImages.reduce((acc, img) => {
+        const key = img.cabin_id.toString();
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(img);
+        return acc;
+      }, {});
+    }
+
+    const cabinsWithImages = cabins.map(cabin => ({
+      ...cabin,
+      images: cabinImagesMap[cabin._id.toString()] || [],
+    }));
+
+    // 3. Hitung harga minimum dari cabin
+    const prices = cabins
+      .map((cabin) => {
+        // Harga bisa string (e.g., "IDR 4.150.000") atau number
+        let priceStr = cabin.price?.toString() || "";
+        // Hapus semua non-digit
+        const numeric = priceStr.replace(/[^0-9]/g, "");
+        return numeric ? parseFloat(numeric) : null;
+      })
+      .filter((p) => p !== null && !isNaN(p));
+
+    const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+
+    const shipData = {
+      ...ship,
+      minPrice,
+      cabins: cabinsWithImages,
+      schedules,
+      images,
+      facilities,
+      specifications,
+      tools,
+    };
+
+    res.json({
+      success: true,
+      data: shipData,
+    });
+  } catch (error) {
+    console.error("Error in getPublicShipBySlug:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
@@ -295,7 +435,6 @@ const updateShip = async (req, res) => {
       masterImagePath = `/uploads/ship/${masterImageFile.filename}`;
     }
 
-    // Update ship utama
     const updatedShip = await Ship.findByIdAndUpdate(
       id,
       {
@@ -497,6 +636,8 @@ const deleteShip = async (req, res) => {
 
 module.exports = {
   getShips,
+  getPublicShips,
+  getPublicShipBySlug,
   getShipById,
   createShip,
   updateShip,
