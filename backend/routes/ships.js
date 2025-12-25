@@ -7,11 +7,12 @@ const upload = require("../middleware/uploudShipMiddleware");
 const router = express.Router();
 
 // GET ALL USERS (admin only)
-router.get("/", verifyToken, getShips);
-router.get("/customer/", getPublicShips);
+router.get("/public",  getPublicShips);
+router.get("/customer", verifyToken, getShips);
 // GET SINGLE USER (admin only)
 router.get("/:id", verifyToken, getShipById);
-router.get("/customer/:slug", getPublicShipBySlug);
+router.get("/public/:slug", getPublicShipBySlug);
+router.get("/customer/:slug", verifyToken, getPublicShipBySlug);
 router.post("/", verifyToken, upload.any(), createShip);
 router.put("/:id", verifyToken, upload.any(), updateShip);
 // DELETE USER (admin only)

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 const AboutUs = () => {
   return (
-    <>
+    <CustomerLayout>
       {/* Hero Section */}
       <section className="relative w-full overflow-hidden">
         <img src={BgAboutUs} alt="Raja Ampat Trip" className="w-full h-auto object-cover max-h-[80vh] md:max-h-[140vh]" loading="lazy" />
@@ -198,7 +198,7 @@ const AboutUs = () => {
                 />
                 <div className="absolute inset-0 bg-black/30 flex flex-col justify-end p-6">
                   <h3 className="text-2xl font-bold text-white mb-4">Open Trip</h3>
-                  <Link to="/product?type=open" className="inline-block bg-white text-gray-800 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors">
+                  <Link to="/customer/product?type=open" className="inline-block bg-white text-gray-800 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors">
                     Discover
                   </Link>
                 </div>
@@ -213,7 +213,7 @@ const AboutUs = () => {
                 />
                 <div className="absolute inset-0 bg-black/30 flex flex-col justify-end p-6">
                   <h3 className="text-2xl font-bold text-white mb-4">Private Trip</h3>
-                  <Link to="/product?type=private" className="inline-block bg-white text-gray-800 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors">
+                  <Link to="/customer/product?type=private" className="inline-block bg-white text-gray-800 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors">
                     Discover
                   </Link>
                 </div>
@@ -222,7 +222,7 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
-    </>
+    </CustomerLayout>
   );
 };
 

@@ -1,4 +1,3 @@
-// src/hooks/useShipBySlug.js
 import { useState, useEffect } from "react";
 import { shipAPI } from "../api/shipAPI";
 
@@ -19,7 +18,7 @@ export const useShipBySlug = (slug) => {
         setLoading(true);
         setError(null);
         const data = await shipAPI.getBySlug(slug);
-        setShip(data.data); // Sesuaikan dengan struktur respons: { success: true, data: { ... } }
+        setShip(data.data); 
       } catch (err) {
         setError(err.message || "Failed to load ship details");
       } finally {

@@ -1,5 +1,6 @@
 import React from "react";
 import { ShieldCheck, Users, Briefcase } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const WhyChooseTripNesia = () => {
   return (
@@ -27,9 +28,6 @@ const WhyChooseTripNesia = () => {
             <p className="text-gray-600 mb-4 text-sm leading-relaxed">Our passionate local guides don't just show you places, they share stories, culture, and hidden gems that transform your journey into an authentic adventure.</p>
             <div className="flex items-center text-green-500 text-xs font-medium">
               <span>Average guide rating: 4.9/5</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M9.049 2.917c1.927-1.927 5.07-1.927 6.998 0S18 8.07 18 10.086c0 1.927-.943 3.854-2.468 5.378a13.734 13.734 0 01-11.066 11.066c-1.927 0-3.854-.943-5.378-2.468A13.734 13.734 0 012.917 10c0-1.927.943-3.854 2.468-5.378a13.734 13.734 0 0111.066-11.066z" />
-              </svg>
             </div>
           </div>
 
@@ -54,10 +52,10 @@ const WhyChooseTripNesia = () => {
         </div>
 
         {/* Button */}
-        <div className="mt-10 text-center">
-          <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition flex items-center gap-2 mx-auto">
+        <div className="mt-10 flex justify-center">
+          <a href={"/"} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition flex items-center gap-2 justify-center w-1/4">
             Find out more reasons to choose us  
-          </button>
+          </a>
         </div>
       </div>
     </section>

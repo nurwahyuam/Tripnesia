@@ -7,7 +7,6 @@ export const usePromos = () => {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
 
-  // Hapus pesan setelah beberapa detik
   const clearMessage = useCallback(() => {
     setMessage(null);
   }, []);
@@ -30,7 +29,32 @@ export const usePromos = () => {
     try {
       setLoading(true);
       setError(null);
-      await promoAPI.create(promoData);
+
+      // 🔁 Konversi ke format backend
+      let discount_value, discount_type;
+      if (promoData.percentage !== "" && promoData.percentage != null) {
+        discount_value = Number(promoData.percentage);
+        discount_type = "percentage";
+      } else if (promoData.price !== "" && promoData.price != null) {
+        discount_value = Number(promoData.price);
+        discount_type = "fixed";
+      } else {
+        throw new Error("Harus isi persentase atau harga diskon");
+      }
+
+      const payload = {
+        code: promoData.code,
+        description: promoData.description,
+        discount_value,
+        discount_type,
+        start_date: promoData.start_date,
+        end_date: promoData.end_date,
+        status: promoData.status,
+        user_id: promoData.user_id || null, // opsional
+        min_pax: promoData.min_pax || 1,
+      };
+
+      await promoAPI.create(payload);
       await fetchPromos();
       setMessage({ type: "success", text: "Data Promo berhasil dibuat!" });
     } catch (err) {
@@ -46,7 +70,32 @@ export const usePromos = () => {
     try {
       setLoading(true);
       setError(null);
-      await promoAPI.update(id, promoData);
+
+      // 🔁 Konversi ke format backend
+      let discount_value, discount_type;
+      if (promoData.percentage !== "" && promoData.percentage != null) {
+        discount_value = Number(promoData.percentage);
+        discount_type = "percentage";
+      } else if (promoData.price !== "" && promoData.price != null) {
+        discount_value = Number(promoData.price);
+        discount_type = "fixed";
+      } else {
+        throw new Error("Harus isi persentase atau harga diskon");
+      }
+
+      const payload = {
+        code: promoData.code,
+        description: promoData.description,
+        discount_value,
+        discount_type,
+        start_date: promoData.start_date,
+        end_date: promoData.end_date,
+        status: promoData.status,
+        user_id: promoData.user_id || null,
+        min_pax: promoData.min_pax || 1,
+      };
+
+      await promoAPI.update(id, payload);
       await fetchPromos();
       setMessage({ type: "success", text: "Data Promo berhasil diperbarui!" });
     } catch (err) {

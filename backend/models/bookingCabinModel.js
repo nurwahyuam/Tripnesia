@@ -5,27 +5,25 @@ const bookingCabinSchema = new mongoose.Schema({
   booking_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Booking',
-    required: true,
+    required: true
   },
   cabin_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Cabin',
-    required: true,
+    required: true
   },
   pax: {
-    type: Number,
-    required: true,
-  },
-  pax_under_five_year: {
-    type: Number,
-    default: 0,
+    adult: { type: Number, required: true },
+    child: { type: Number, required: true }
   },
   price: {
     type: Number,
-    required: true,
+    required: true
   },
-}, {
-  timestamps: true,
+  other: {
+    type: Object, // Atau definisikan skema lebih spesifik jika diperlukan
+    default: {}
+  }
 });
 
 module.exports = mongoose.model('BookingCabin', bookingCabinSchema);

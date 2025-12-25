@@ -1,35 +1,41 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 import { jwtDecode } from "jwt-decode";
 
 export const AuthProvider = ({ children }) => {
-  // Inisialisasi dari localStorage
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-  const [role, setRole] = useState(() => {
-    if (user) {
-      const decoded = jwtDecode(localStorage.getItem("accessToken"));
-      return decoded.role;
-    }
-  });
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null); // ✅ inisialisasi null
+  const [accessToken, setAccessToken] = useState(null); // ✅ jangan ambil dari localStorage di 
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const storedUser = localStorage.getItem("user");
-
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-      const decoded = jwtDecode(token);
-      setRole(decoded.role);
-    }
+  const updateLocalUser = useCallback((updatedUserData) => {
+    setUser((prev) => {
+      const newUser = { ...prev, ...updatedUserData };
+      localStorage.setItem("user", JSON.stringify(newUser));
+      return newUser;
+    });
   }, []);
 
-  const [accessToken, setAccessToken] = useState(() => {
-    return localStorage.getItem("accessToken") || null;
-  });
+  // 🔑 Inisialisasi dari localStorage hanya di useEffect
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("accessToken");
+
+    if (token && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        const decoded = jwtDecode(token);
+
+        setUser(parsedUser);
+        setRole(decoded.role);
+        setAccessToken(token);
+      } catch (error) {
+        console.error("Invalid auth data in localStorage", error);
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+      }
+    }
+  }, []);
 
   const axiosAuth = axios.create({
     baseURL: "http://localhost:4000/api/auth",
@@ -101,5 +107,5 @@ export const AuthProvider = ({ children }) => {
     await axiosAuth.post("/reset-password", { email, code, password });
   };
 
-  return <AuthContext.Provider value={{ role, user, accessToken, signup, login, logout, forgotPassword, checkOTP, resetPassword, axiosAuth }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ role, user, accessToken, signup, login, logout, forgotPassword, checkOTP, resetPassword, axiosAuth, updateLocalUser, }}>{children}</AuthContext.Provider>;
 };

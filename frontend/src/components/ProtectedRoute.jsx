@@ -1,10 +1,9 @@
 import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import CustomerLayout from "../layouts/CustomerLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-const ProtectedRoute = ({ allowedRoles }) => {
+const ProtectedRoute = ({allowedRoles}) => {
   const { role, user, loading } = useContext(AuthContext);
 
   if (loading) return <div>Loading...</div>;
@@ -24,9 +23,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
           <Outlet />
         </AdminLayout>
       ) : (
-        <CustomerLayout>
-          <Outlet />
-        </CustomerLayout>
+        <Outlet />
       )}
     </>
   );

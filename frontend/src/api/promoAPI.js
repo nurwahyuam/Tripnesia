@@ -1,5 +1,4 @@
-
-import { apiFetch } from "../lib/api";
+import { apiFetch, apiFetchPublic } from "../lib/api";
 
 export const promoAPI = {
   getAll: () => apiFetch("/promos"),
@@ -17,4 +16,8 @@ export const promoAPI = {
     apiFetch(`/promos/${id}`, {
       method: "DELETE",
     }),
+  getByCode: (code, shipId = null) => {
+    const url = shipId ? `/promos/code?code=${code}&shipId=${shipId}` : `/promos/code?code=${code}`;
+    return apiFetchPublic(url);
+  },
 };

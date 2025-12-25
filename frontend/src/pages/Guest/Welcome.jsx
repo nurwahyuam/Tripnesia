@@ -6,8 +6,14 @@ import GuestSelector from "../../components/GuestSelector";
 import TripSlider from "../../components/TripSlider";
 import DiscoverRajaAmpatSection from "../../components/DiscoverRajaAmpatSection";
 import WhyChooseTripNesia from "../../components/WhyChooseTripNesia";
+import { formatDate } from "../../lib/dateFormatter";
+import { usePublicShips } from "../../hooks/usePublicShips";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import BgPromo from "../../assets/Bg-Promo.png";
 
 const Welcome = () => {
+  const navigate = useNavigate(); // Gunakan useNavigate
+  const { ships } = usePublicShips();
   const [tripType, setTripType] = useState("Open Trip");
   const [passengerCount, setPassengerCount] = useState(1);
   const [dateRange, setDateRange] = useState({
@@ -16,85 +22,30 @@ const Welcome = () => {
   });
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const formatDate = (date) => {
-    if (!date) return "";
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  };
-
   const handleDateChange = (range) => {
     setDateRange(range);
     setShowCalendar(false);
   };
 
-  const trips = [
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With Akassa Cruise",
-      price: "IDR 9.000.000/person",
-      operator: "Akassa Cruise",
-      isTour: false,
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1589308078499-cd0b155245f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With Carnaby",
-      price: "IDR 8.000.000/person",
-      operator: "Carnaby",
-      isTour: false,
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1579403124614-197f69d8187b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With 3 Islands",
-      price: "IDR 3.500.000/person",
-      operator: "3 Islands",
-      isTour: true,
-    },
-    {
-      id: 4,
-      image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With Cordelia",
-      price: "IDR 4.950.000/person",
-      operator: "Cordelia",
-      isTour: false,
-    },
-    {
-      id: 5,
-      image: "https://images.unsplash.com/photo-1503950880713-7798e1254483?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With Andalucia",
-      price: "IDR 4.150.000/person",
-      operator: "Andalucia",
-      isTour: true,
-    },
-    {
-      id: 6,
-      image: "https://images.unsplash.com/photo-1503950880713-7798e1254483?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With Andalucia",
-      price: "IDR 4.150.000/person",
-      operator: "Andalucia",
-      isTour: true,
-    },
-    {
-      id: 7,
-      image: "https://images.unsplash.com/photo-1503950880713-7798e1254483?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      type: "Open trip",
-      title: "3 Days 2 Nights Open Trip With Andalucia",
-      price: "IDR 4.150.000/person",
-      operator: "Andalucia",
-      isTour: true,
-    },
-  ];
+  // Handler untuk tombol search
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+
+    // Trip type
+    params.set("type", tripType === "Private Trip" ? "private" : "open");
+
+    // Date range
+    if (dateRange.startDate && dateRange.endDate) {
+      params.set("startDate", dateRange.startDate.toISOString().split("T")[0]);
+      params.set("endDate", dateRange.endDate.toISOString().split("T")[0]);
+    }
+
+    // Passenger count
+    params.set("pax", passengerCount);
+
+    // Navigate ke halaman product dengan filter
+    navigate(`/product?${params.toString()}`);
+  };
 
   useEffect(() => {
     const shouldReload = sessionStorage.getItem("reloadOnce");
@@ -103,6 +54,10 @@ const Welcome = () => {
       window.location.reload();
     }
   }, []);
+
+  const handlePromo = () => {
+    navigate("/login");
+  };
 
   return (
     <GuestLayout>
@@ -149,16 +104,21 @@ const Welcome = () => {
                     </div>
 
                     {/* Guest Selector */}
-                    <GuestSelector value={passengerCount} onChange={setPassengerCount} />
+                    <GuestSelector value={passengerCount} onChange={setPassengerCount} welcome={false}/>
 
                     {/* Search Button */}
-                    <button className="px-8 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition-colors font-medium w-full md:w-auto">Search</button>
+                    <button 
+                      onClick={handleSearch} // Gunakan handler baru
+                      className="px-8 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition-colors font-medium w-full md:w-auto"
+                    >
+                      Search
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </section>  
 
         {/* Explore Our Trip Section */}
         <section className="py-16 bg-white">
@@ -166,7 +126,7 @@ const Welcome = () => {
             <div className="mb-3">
               <h1 className="text-2xl font-semibold">Explore Our Trip</h1>
             </div>
-            <TripSlider trips={trips} />
+            <TripSlider trips={ships} />
           </div>
         </section>
 
@@ -176,9 +136,12 @@ const Welcome = () => {
             <div className="relative overflow-hidden rounded-2xl">
               {/* Background Image */}
               <div
-                className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-cover bg-center"
+                className="relative h-[600px] bg-cover bg-center flex items-center justify-center"
                 style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')`,
+                  backgroundImage: `url(${BgPromo})`,
+                  backgroundPosition: "center", // Pastikan posisi tengah
+                  backgroundSize: "cover", // Gambar mengisi container
+                  backgroundRepeat: "no-repeat", // Hindari pengulangan
                 }}
                 role="img"
                 aria-label="Promo boat trip in Raja Ampat"
@@ -191,7 +154,9 @@ const Welcome = () => {
                   <div className="bg-white/95 backdrop-blur-sm p-5 sm:p-6 rounded-xl shadow-lg">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Launching Promo: Get 20% Off!</h2>
                     <p className="text-xs sm:text-sm text-gray-600 mb-4">Celebrate your holiday with an unforgettable adventure! Enjoy up to 20% off on a variety of boat rentals to Raja Ampat's favorite destinations.</p>
-                    <button className="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium text-sm">Get Deals</button>
+                    <button onClick={handlePromo} className="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium text-sm">
+                      Get Deals
+                    </button>
                   </div>
                 </div>
               </div>

@@ -3,7 +3,7 @@ import React from "react";
 const InputForm = ({ 
   label, 
   type = "text", 
-  value, 
+  value,
   onChange, 
   placeholder, 
   required = false, 

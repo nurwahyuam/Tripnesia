@@ -3,7 +3,8 @@ const {
   getPromos,
   updatePromo,
   deletePromo,
-  createPromo
+  createPromo,
+  getPromoByCode
 } = require("../controller/promoController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
@@ -18,5 +19,7 @@ router.post("/", verifyToken, createPromo);
 router.put("/:id", verifyToken, updatePromo);
 // DELETE USER (admin only)
 router.delete("/:id", verifyToken, deletePromo);
+
+router.get("/code", getPromoByCode);
 
 module.exports = router;

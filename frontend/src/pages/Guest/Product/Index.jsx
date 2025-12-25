@@ -1,5 +1,5 @@
 // src/pages/Guest/Product/Index.jsx
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import GuestLayout from "../../../layouts/GuestLayout";
 import Breadcrumb from "../../../components/Breadcrumb";
 import { usePublicShips } from "../../../hooks/usePublicShips";
@@ -9,35 +9,38 @@ import GuestSelector from "../../../components/GuestSelector";
 import { Calendar, Wallet, X } from "lucide-react";
 import { getImageUrl } from "../../../lib/getImageUrl";
 import IconFerry from "../../../assets/icons/Ferry-Boat.svg";
+import { formatDate } from "../../../lib/dateFormatter";
+import { formatPrice } from "../../../lib/formatPrice";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialType = searchParams.get("type") || "open";
-  const [tripType, setTripType] = useState(initialType === "private" ? "Private Trip" : "Open Trip");
+  const initialStartDate = searchParams.get("startDate");
+  const initialEndDate = searchParams.get("endDate");
+  const initialPax = searchParams.get("pax");
 
+  const [tripType, setTripType] = useState(initialType === "private" ? "Private Trip" : "Open Trip");
   const [filters, setFilters] = useState({
     tripDuration: [],
     classTrip: [],
     budget: [],
     shipBrand: [],
   });
-
   const [sortBy, setSortBy] = useState("recommended");
-  const [paxCount, setPaxCount] = useState(null);
+  const [paxCount, setPaxCount] = useState(initialPax ? parseInt(initialPax) : null);
 
-  // State untuk date picker
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // State untuk date picker - gunakan nilai dari URL jika ada
   const [selectedDates, setSelectedDates] = useState({
-    startDate: null,
-    endDate: null,
+    startDate: initialStartDate ? new Date(initialStartDate) : null,
+    endDate: initialEndDate ? new Date(initialEndDate) : null,
   });
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(9);
 
   const { ships, loading, error } = usePublicShips();
-  console.log(ships);
 
-  // Filter options sesuai gambar
   const filterOptions = {
-    tripDuration: ["2 Day", "3 Day", "4 Day", "More Than 5 Days"],
+    tripDuration: ["2 Days", "3 Days", "4 Days", "More Than 5 Days"],
     classTrip: ["Standard", "Superior", "Deluxe", "Luxury"],
     budget: ["Less than IDR 2,000,000", "IDR 2,000,000 - IDR 5,000,000", "IDR 5,000,000 - IDR 7,000,000", "IDR 7,000,000 - IDR 10,000,000", "More than IDR 10,000,000"],
     shipBrand: useMemo(() => {
@@ -63,6 +66,44 @@ const Index = () => {
     }));
   };
 
+  // Update URL saat trip type berubah
+  const handleTripTypeChange = (type) => {
+    const newType = type === "Private Trip" ? "private" : "open";
+    setTripType(type);
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("type", newType);
+      return newParams;
+    });
+  };
+
+  // Update URL saat date berubah
+  const handleDateChange = (dates) => {
+    setSelectedDates({
+      startDate: dates.startDate,
+      endDate: dates.endDate,
+    });
+    if (dates.startDate && dates.endDate) {
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set("startDate", dates.startDate.toISOString().split("T")[0]);
+        newParams.set("endDate", dates.endDate.toISOString().split("T")[0]);
+        return newParams;
+      });
+      setShowDatePicker(false);
+    }
+  };
+
+  // Update URL saat pax berubah
+  const handlePaxChange = (newPaxCount) => {
+    setPaxCount(newPaxCount);
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("pax", newPaxCount);
+      return newParams;
+    });
+  };
+
   const clearFilters = () => {
     setFilters({
       tripDuration: [],
@@ -76,49 +117,11 @@ const Index = () => {
     });
     setPaxCount(null);
     setShowDatePicker(false);
-  };
-
-  const handleTripTypeChange = (type) => {
-    const newType = type === "Private Trip" ? "private" : "open";
-    setTripType(type);
-    setSearchParams({ type: newType });
-  };
-
-  // Handler untuk date range picker
-  const handleDateChange = (dates) => {
-    setSelectedDates({
-      startDate: dates.startDate,
-      endDate: dates.endDate,
-    });
-    if (dates.startDate && dates.endDate) {
-      setShowDatePicker(false);
-    }
-  };
-
-  // Handler untuk guest selector
-  const handlePaxChange = (newPaxCount) => {
-    setPaxCount(newPaxCount);
-  };
-
-  // Format date untuk display
-  const formatDisplayDate = (date) => {
-    if (!date) return "";
-    return new Date(date).toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    // Hapus semua parameter kecuali type
+    setSearchParams({
+      type: tripType === "Private Trip" ? "private" : "open",
     });
   };
-
-  const formatPrice = useCallback((price) => {
-    if (!price || price === 0 || price === null) return "Price not available";
-
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  }, []);
 
   const calculateDuration = useCallback((date_start, date_end) => {
     try {
@@ -126,7 +129,7 @@ const Index = () => {
       const end = new Date(date_end);
       const diffTime = Math.abs(end - start);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays;
+      return diffDays + 1;
     } catch (e) {
       return e;
     }
@@ -141,9 +144,7 @@ const Index = () => {
   // Map ships data to UI format
   const mappedTrips = useMemo(() => {
     if (!Array.isArray(ships)) return [];
-
     const expandedTrips = [];
-
     ships
       .filter((ship) => {
         const shipType = ship.type?.toLowerCase() || "";
@@ -153,9 +154,7 @@ const Index = () => {
       .forEach((ship) => {
         // Default: at least one "virtual" schedule if none exist
         const schedulesToUse = ship.schedules && ship.schedules.length > 0 ? ship.schedules : [{ name: "Trip", _id: "default" }];
-
         schedulesToUse.forEach((schedule) => {
-          // Calculate durations from cabins or fallback
           let durations = [];
           if (ship.cabins && Array.isArray(ship.cabins) && ship.cabins.length > 0) {
             const cabinDurations = ship.cabins.map((cabin) => calculateDuration(cabin.date_start, cabin.date_end)).filter((days) => days > 0);
@@ -163,15 +162,12 @@ const Index = () => {
               durations = [...new Set(cabinDurations)];
             }
           }
-
           if (durations.length === 0) {
-            // Try to infer from schedule name like "3 Days 2 Nights"
             const daysMatch = schedule.name?.match(/(\d+)\s*Days?/i);
-            const durationFromName = daysMatch ? parseInt(daysMatch[1], 10) : 3;
+            const durationFromName = daysMatch ? parseInt(daysMatch[1], 10) : 2;
             durations = [durationFromName];
           }
 
-          // Min price logic
           let minPrice = ship.minPrice;
           if (!minPrice && ship.cabins?.length > 0) {
             const cabinPrices = ship.cabins.map((cabin) => parsePrice(cabin.price)).filter((p) => p > 0);
@@ -188,7 +184,7 @@ const Index = () => {
 
           const durationDisplay = durations.map((days) => {
             if (days > 5) return "More Than 5 Days";
-            return `${days} Day${days > 1 ? "s" : ""}`;
+            return `${days} Day`;
           });
 
           expandedTrips.push({
@@ -217,9 +213,8 @@ const Index = () => {
           });
         });
       });
-
     return expandedTrips;
-  }, [ships, tripType, calculateDuration, parsePrice, formatPrice]);
+  }, [ships, tripType, calculateDuration, parsePrice]);
 
   // Apply filters dengan date filter dan pax filter
   const filteredTrips = useMemo(() => {
@@ -230,9 +225,10 @@ const Index = () => {
         if (trip.minPax && paxCount < trip.minPax) return false;
       }
 
-      // Trip Duration filter - sesuai dengan format gambar
       if (filters.tripDuration.length > 0) {
-        const hasMatchingDuration = trip.durations.some((duration) => filters.tripDuration.includes(duration));
+        const hasMatchingDuration = trip.durations.some((duration) => {
+          return filters.tripDuration.some((filter) => filter.replace("s", "") === duration.replace("s", ""));
+        });
         if (!hasMatchingDuration) return false;
       }
 
@@ -254,7 +250,6 @@ const Index = () => {
         if (!trip.minPrice || trip.minPrice === 0) {
           return false;
         }
-
         const passesBudget = filters.budget.some((range) => {
           const budgetRange = getBudgetRange(range);
           return trip.minPrice >= budgetRange.min && trip.minPrice <= budgetRange.max;
@@ -268,7 +263,6 @@ const Index = () => {
           trip.cabins &&
           trip.cabins.some((cabin) => {
             if (!cabin.date_start || !cabin.date_end) return false;
-
             const cabinStart = new Date(cabin.date_start);
             const cabinEnd = new Date(cabin.date_end);
             const selectedStart = new Date(selectedDates.startDate);
@@ -278,7 +272,6 @@ const Index = () => {
             const hasOverlap = selectedStart <= cabinEnd && selectedEnd >= cabinStart;
             return hasOverlap;
           });
-
         if (!hasAvailableCabins) return false;
       }
 
@@ -286,10 +279,8 @@ const Index = () => {
     });
   }, [mappedTrips, filters, selectedDates, paxCount]);
 
-  // Sort trips berdasarkan pilihan user
   const sortedTrips = useMemo(() => {
     const trips = [...filteredTrips];
-
     switch (sortBy) {
       case "price-low":
         return trips.sort((a, b) => (a.minPrice || 0) - (b.minPrice || 0));
@@ -299,7 +290,6 @@ const Index = () => {
         return trips.sort((a, b) => (a.durationDays || 0) - (b.durationDays || 0));
       case "recommended":
       default:
-        // Recommended: tersedia dulu, lalu harga terendah
         return trips.sort((a, b) => {
           if (a.hasCabins !== b.hasCabins) return b.hasCabins - a.hasCabins;
           return (a.minPrice || 0) - (b.minPrice || 0);
@@ -307,8 +297,17 @@ const Index = () => {
     }
   }, [filteredTrips, sortBy]);
 
-  // Close date picker ketika klik di luar
-  React.useEffect(() => {
+  // ✅ Handler untuk tombol "Show More"
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 9);
+  };
+
+  // ✅ Reset visible count saat filter berubah
+  useEffect(() => {
+    setVisibleCount(9);
+  }, [filters, selectedDates, paxCount, tripType, sortBy]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (showDatePicker && !event.target.closest(".date-picker-container")) {
         setShowDatePicker(false);
@@ -346,13 +345,12 @@ const Index = () => {
                 <Calendar className="absolute left-3 top-3 z-10 text-gray-400" size={24} />
                 <button onClick={() => setShowDatePicker(!showDatePicker)} className="w-full px-4 py-2.5 pl-12 border border-gray-300 rounded-xl text-left bg-white flex justify-between items-center hover:border-gray-400 transition-colors">
                   <span className={`${selectedDates.startDate ? "text-gray-900" : "text-gray-500"}`}>
-                    {selectedDates.startDate && selectedDates.endDate ? `${formatDisplayDate(selectedDates.startDate)} - ${formatDisplayDate(selectedDates.endDate)}` : "Select trip dates"}
+                    {selectedDates.startDate && selectedDates.endDate ? `${formatDate(selectedDates.startDate)} - ${formatDate(selectedDates.endDate)}` : "Select trip dates"}
                   </span>
                   <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${showDatePicker ? "rotate-180 text-gray-700" : "text-gray-400"}`} viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
-
                 {showDatePicker && <DateRangePicker onChange={handleDateChange} initialStartDate={selectedDates.startDate} initialEndDate={selectedDates.endDate} />}
               </div>
               <GuestSelector value={paxCount} onChange={handlePaxChange} />
@@ -455,8 +453,8 @@ const Index = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-md text-gray-800">
                     {sortedTrips.length} {sortedTrips.length === 1 ? "result" : "results"} found
-                    {selectedDates.startDate && selectedDates.endDate && ` for selected dates`}
-                    {paxCount > 1 && ` for ${paxCount} people`}
+                    {selectedDates.startDate && selectedDates.endDate ? ` for selected dates` : ""}
+                    {paxCount > 1 ? ` for ${paxCount} people` : ""}
                   </h2>
                   <div className="flex items-center space-x-4">
                     <span className="text-sm text-gray-600">Sort by:</span>
@@ -484,64 +482,93 @@ const Index = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {sortedTrips.map((trip) => (
-                      <Link
-                        key={trip.id}
-                        to={`/product/${trip.slug}`}
-                        className={`bg-white rounded-2xl border border-gray-300 hover:shadow-sm transition-shadow duration-300 flex flex-col ${!trip.hasCabins ? "cursor-not-allowed" : "cursor-pointer"}`}
-                        onClick={(e) => {
-                          if (!trip.hasCabins) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div className="h-48 flex items-center justify-center relative rounded-4xl overflow-hidden">
-                          <div className="p-2.5 w-full h-full">
-                            <img
-                              src={trip.image}
-                              alt={trip.title}
-                              className="w-full h-full rounded-lg object-cover"
-                              onError={(e) => {
-                                e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
-                              }}
-                            />
+                    {sortedTrips.slice(0, visibleCount).map(
+                      (
+                        trip // <--- Apply slice here
+                      ) => (
+                        <Link
+                          key={trip.id}
+                          to={`/product/${trip.slug}`}
+                          className={`bg-white rounded-2xl border border-gray-300 hover:shadow-sm transition-shadow duration-300 flex flex-col ${!trip.hasCabins ? "cursor-not-allowed" : "cursor-pointer"}`}
+                          onClick={(e) => {
+                            if (!trip.hasCabins) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          <div className="h-48 flex items-center justify-center relative rounded-4xl overflow-hidden">
+                            <div className="p-2.5 w-full h-full">
+                              <img
+                                src={trip.image}
+                                alt={trip.title}
+                                className="w-full h-full rounded-lg object-cover"
+                                onError={(e) => {
+                                  e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
-
-                        <div className="pl-4 pr-4 pb-4 pt-1">
-                          <div className="mb-3">
-                            <span className="text-sm font-medium rounded flex items-center gap-2 text-gray-400">
-                              <Wallet size={20} />
-                              {trip.type}
-                            </span>
-                          </div>
-
-                          <div className="mb-3">
-                            <span className="flex text-start font-bold text-gray-800 text-lg">{`${trip.scheduleName} ${trip.type} With ${trip.title}`}</span>
-                          </div>
-
-                          <div className="mb-3">
-                            <p className="flex text-start text-sm text-gray-400">Starting from</p>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xl font-bold">
-                                {trip.price}
-                                <span className="font-semibold">
-                                  /<span className="text-sm font-bold">person</span>
+                          <div className="pl-4 pr-4 pb-4 pt-1">
+                            <div className="mb-3">
+                              <span className="text-sm font-medium rounded flex items-center gap-2 text-gray-400">
+                                <Wallet size={20} />
+                                {trip.type}
+                              </span>
+                            </div>
+                            <div className="mb-3">
+                              <span className="flex text-start font-bold text-gray-800 text-lg">{`${trip.scheduleName} ${trip.type} With ${trip.title}`}</span>
+                            </div>
+                            <div className="mb-3">
+                              <p className="flex text-start text-sm text-gray-400">Starting from</p>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xl font-bold">
+                                  {trip.price}
+                                  <span className="font-semibold">
+                                    /<span className="text-sm font-bold">person</span>
+                                  </span>
                                 </span>
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-sm flex items-center gap-2 text-gray-500">
+                                <img src={IconFerry} alt="Icon Tripnesia" />
+                                {trip.title}
                               </span>
                             </div>
                           </div>
-
-                          <div>
-                            <span className="text-sm flex items-center gap-2 text-gray-500">
-                              <img src={IconFerry} alt="Icon Tripnesia" />
-                              {trip.title}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      )
+                    )}
                   </div>
+                )}
+
+                {/* Conditional rendering for Show More and "Showing all trips" */}
+                {sortedTrips.length > 0 && ( 
+                  <>
+                    {sortedTrips.length > visibleCount && ( // <--- Check against full sortedTrips length
+                      <div className="relative my-12">
+                        <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-400"></div>
+                        <div className="relative z-10 text-center">
+                          <button onClick={handleShowMore}className="inline-block bg-white px-4 text-md font-semibold text-gray-800 border border-white py-2 hover:cursor-pointer">
+                            <span className="border border-gray-400 px-20 py-3 rounded-4xl">Show More</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {sortedTrips.length <= visibleCount && (
+                      <div className="relative my-12">
+                        <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-400"></div>
+                        <div className="relative z-10 text-center">
+                          <div
+                          className="inline-block bg-white px-4 text-md font-semibold text-gray-400 border border-white py-2 hover:cursor-not-allowed"
+                        >
+                          <p className="border border-gray-400 px-20 py-3 rounded-4xl">Showing all {sortedTrips.length} trips</p>
+                        </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}

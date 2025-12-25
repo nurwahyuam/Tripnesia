@@ -1,3 +1,4 @@
+// src/api/userAPI.js
 import { apiFetch } from "../lib/api";
 
 export const userAPI = {
@@ -15,5 +16,15 @@ export const userAPI = {
   delete: (id) =>
     apiFetch(`/users/${id}`, {
       method: "DELETE",
+    }),
+  updateProfile: (data) =>
+    apiFetch(`/users/profile/${data.userId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  changePassword: (data) =>
+    apiFetch(`/users/password/${data.userId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
     }),
 };

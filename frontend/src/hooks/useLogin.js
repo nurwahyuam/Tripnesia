@@ -13,16 +13,13 @@ export const useLogin = () => {
       const timer = setTimeout(() => setError(""), 3000);
       return () => clearTimeout(timer);
     }
-  }, [error]);
-
-  useEffect(() => {
     if (success) {
       const timer = setTimeout(() => setSuccess(""), 3000);
       return () => clearTimeout(timer);
     }
-  }, [success]);
+  }, [error, success]);
 
-  const handleLogin = async (email, password) => {
+  const handleLogin = async (email, password, slug = null, fromCheckout = false) => {
     try {
       await login(email, password);
 
@@ -30,7 +27,13 @@ export const useLogin = () => {
         if (user?.role === "admin") {
           navigate("/admin/dashboard");
         } else {
-          navigate("/customer/dashboard");
+          // Jika login dari checkout, redirect ke checkout
+          if (fromCheckout && slug) {
+            navigate(`/customer/product/${slug}/checkout`);
+          } else {
+            // Jika login langsung dari halaman login, redirect ke dashboard
+            navigate("/customer/dashboard");
+          }
         }
       }
       setSuccess("Berhasil Log In");

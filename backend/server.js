@@ -10,6 +10,12 @@ const userRoutes = require("./routes/users");
 const shipRoutes = require("./routes/ships");
 const promoRoutes = require("./routes/promos");
 const cabinRoutes = require("./routes/cabins");
+const favoriteShipRoutes = require("./routes/favorites");
+const bookingRoutes = require("./routes/bookings")
+const paymentRoutes = require("./routes/payments")
+const notificationRoutes = require("./routes/notification")
+const dashboardRoutes = require("./routes/dashboard")
+const { startExpiryChecker } = require('./controller/bookingController');
 
 const app = express();
 
@@ -17,7 +23,6 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS (frontend vite di localhost:5173)
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -25,13 +30,20 @@ app.use(
   })
 );
 
+startExpiryChecker()
+
 // Routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ships", shipRoutes);
 app.use("/api/promos", promoRoutes);
 app.use("/api/cabins", cabinRoutes);
+app.use("/api/favorites", favoriteShipRoutes);
+app.use("/api/booking", bookingRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Database & Server
 const startServer = async () => {

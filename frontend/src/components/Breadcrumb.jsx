@@ -16,7 +16,10 @@ const Breadcrumb = () => {
 
         // Jika setelah /product maka ubah jadi "Boat Detail"
         if (pathnames[index - 1] === "product") {
-          name = "Boat Detail";
+          name = "Ship Details";
+        }
+        if (pathnames[index - 2] === "product") {
+          name = "Checkout Details";
         }
 
         return { name, path: to };

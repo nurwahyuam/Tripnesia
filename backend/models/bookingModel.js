@@ -1,40 +1,51 @@
-// models/Booking.js
 const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
   ship_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Ship',
-    required: true,
+    required: true
+  },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   promo_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Promo',
-    default: null,
+    default: null
+  },
+  booking_date: {
+    type: Date,
+    default: Date.now
   },
   status: {
     type: String,
-    enum: ['pending', 'paid', 'completed', 'rejected'],
-    default: 'pending',
+    enum: ['pending', 'confirmed', 'cancelled'],
+    default: 'pending'
   },
   total_price: {
     type: Number,
-    required: true,
+    required: true
   },
-  expired_at: {
+  personal_info: {
+    title: { type: String, required: true },
+    full_name: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String, required: true }
+  },
+  // Tambahkan field invoice_code
+  invoice_code: {
+    type: String,
+    required: true,
+    unique: true, // Pastikan kode unik
+    index: true // Tambahkan index untuk pencarian cepat
+  },
+  created_at: {
     type: Date,
-    required: true,
-  },
-}, {
-  timestamps: true, // menambahkan createdAt & updatedAt
+    default: Date.now
+  }
 });
-
-// Index untuk expired_at agar cron job lebih cepat
-bookingSchema.index({ expired_at: 1 });
 
 module.exports = mongoose.model('Booking', bookingSchema);

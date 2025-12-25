@@ -29,6 +29,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Nomor telepon wajib diisi"],
     },
+    date_of_birth: {
+      type: Date,
+    },
+    greeting: {
+      type: String,
+      enum: ["Mr", "Mrs", "Unknown"],
+      default: "Unknown"
+    },
     support: {
       type: Boolean,
       default: false,

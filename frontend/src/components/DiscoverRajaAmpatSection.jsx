@@ -1,46 +1,45 @@
-import React from 'react';
-import RajaAmpatCard from './RajaAmpatCard';
+import React from "react";
+import RajaAmpatCard from "./RajaAmpatCard";
+import image2 from "../assets/Discover/1.png";
+import image4 from "../assets/Discover/2.png";
+import image1 from "../assets/Discover/3.png";
+import image3 from "../assets/Discover/4.png";
 
 const DiscoverRajaAmpatSection = () => {
   const destinations = [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: image1,
       title: "Pianemo Hill: A Piece of Heaven in Raja Ampat, West Papua",
-      description: "Hike to the iconic viewpoint and witness the breathtaking panorama of countless islands scattered across turquoise waters."
+      description: "Hike to the iconic viewpoint and witness the breathtaking panorama of karst islands surrounded by turquoise waters.",
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1589308078499-cd0b155245f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      title: "Blue River: Raja Ampat’s Hidden Gem",
-      description: "At Blue River, you can swim in crystal-clear turquoise waters and relax in the lush jungle surroundings."
+      image: image2,
+      title: "Blue River: The Hidden Oasis of Raja Ampat",
+      description: "Swim in the crystal-clear turquoise waters of Blue River, a serene spot tucked within lush tropical forests.",
     },
     {
       id: 3,
-      image: "https://images.unsplash.com/photo-1579403124614-197f69d8187b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      title: "Pianemo Hill: A Piece of Heaven in Raja Ampat, West Papua",
-      description: "Explore the hidden coves and snorkel among vibrant coral reefs that make this area a diver's paradise."
+      image: image3,
+      title: "Wayag Island: The Iconic Peaks of Raja Ampat",
+      description: "Climb to the top of Wayag’s limestone hills and enjoy one of the most stunning views in Indonesia — a sea dotted with emerald islands.",
     },
     {
       id: 4,
-      image: "https://images.unsplash.com/photo-1503950880713-7798e1254483?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      title: "Pianemo Hill: A Piece of Heaven in Raja Ampat, West Papua",
-      description: "Stand on the cliff edge and feel the sea breeze while taking in views that look like they’re straight out of a postcard."
+      image: image4,
+      title: "Pasir Timbul: The Vanishing Sand Island",
+      description: "Visit this magical sandbar that appears only during low tide, surrounded by clear blue waters perfect for snorkeling.",
     },
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-10 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl font-bold mb-8">Discover More about Raja Ampat</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {destinations.map((dest) => (
-            <RajaAmpatCard
-              key={dest.id}
-              image={dest.image}
-              title={dest.title}
-              description={dest.description}
-            />
+            <RajaAmpatCard key={dest.id} image={dest.image} title={dest.title} description={dest.description} />
           ))}
         </div>
       </div>

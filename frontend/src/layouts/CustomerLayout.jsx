@@ -2,10 +2,10 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const CustomerLayout = ({children}) => {
+const CustomerLayout = ({ children, hideNavbar = false }) => {
   return (
     <div>
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       {children}
       <Footer />
     </div>

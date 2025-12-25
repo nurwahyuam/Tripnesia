@@ -19,6 +19,11 @@ const cabinSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ["private room", "shared room"],
+      required: true,
+    },
     pax: {
       type: Number,
     },

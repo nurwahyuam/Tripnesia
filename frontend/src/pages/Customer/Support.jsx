@@ -5,6 +5,7 @@ import SupportCard from "../../components/SupportCard";
 import ContactSection from "../../components/ContactSection";
 import Breadcrumb from "../../components/Breadcrumb";
 import { MessagesSquare, Search, ChevronDown, ChevronUp } from "lucide-react";
+import CustomerLayout from "../../layouts/CustomerLayout";
 
 const Support = () => {
   const [showAll, setShowAll] = useState(false);
@@ -374,7 +375,7 @@ const Support = () => {
   }, [searchQuery]);
 
   return (
-    <>
+    <CustomerLayout>
       <Breadcrumb />
       {/* Hero Section */}
       <section className="py-10 bg-white">
@@ -418,7 +419,7 @@ const Support = () => {
           <ContactSection />
         </div>
       </div>
-    </>
+    </CustomerLayout>
   );
 };
 

@@ -1,10 +1,9 @@
-// src/models/PlanDays.js
 const mongoose = require('mongoose');
 
 const planDaysSchema = new mongoose.Schema({
   plan_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Schedule', // karena terhubung ke schedule
+    ref: 'Schedule',
     required: true,
   },
   day: {
@@ -14,7 +13,7 @@ const planDaysSchema = new mongoose.Schema({
   },
   plans: {
     type: mongoose.Schema.Types.Mixed,
-    required: true,
+    required: true, 
   },
 }, {
   timestamps: true,

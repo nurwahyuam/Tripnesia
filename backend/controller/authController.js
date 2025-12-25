@@ -83,6 +83,9 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        no_phone: user.number_telephone,
+        date_of_birth: user.date_of_birth,
+        greeting: user.greeting,
       },
       accessToken,
     });
@@ -108,7 +111,7 @@ const refresh = (req, res) => {
 const logout = (req, res) => {
   res.clearCookie("refreshToken");
   res.json({ message: "Logged out" });
-};
+};  
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;

@@ -11,6 +11,15 @@ const getUsers = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// const getUserId = async (req, res) => {
+//   try {
+//     const users = await User.find().select("-password");
+//     res.status(200).json(users);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
 // CREATE USER
 const createUser = async (req, res) => {
   try {
@@ -63,11 +72,159 @@ const deleteUser = async (req, res) => {
     }
     const user = await User.findByIdAndDelete(id);
     if (!user) {
-      return res.status(404).json({ error: 'User tidak ditemukan' });
+      return res.status(404).json({ error: "User tidak ditemukan" });
     }
-    res.status(200).json({ message: 'Pengguna Berhasil Dihapus!' });
+    res.status(200).json({ message: "Pengguna Berhasil Dihapus!" });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+// controller/userController.js
+const updateUserProfile = async (req, res) => {
+  try {
+    // Dapatkan user ID dari parameter route
+    const userId = req.params.id;
+
+    if (req.user.id !== userId) {
+      return res.status(403).json({
+        message: "You can only update your own profile",
+      });
+    }
+
+    const { name, date_of_birth, greeting, no_phone, email } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({
+        message: "Name and email are required",
+      });
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        date_of_birth,
+        greeting,
+        no_phone,
+        email,
+      },
+      { new: true, runValidators: true }
+    ).select("-password"); // Jangan kembalikan password
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        message: "Invalid user ID format",
+      });
+    }
+
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: error.message,
+      });
+    }
+
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Verifikasi bahwa user yang login sama dengan user yang akan diupdate
+    if (req.user.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only change your own password"
+      });
+    }
+
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    // Validasi input
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "All password fields are required"
+      });
+    }
+
+    // Validasi password match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password and confirm password don't match"
+      });
+    }
+
+    // Validasi panjang password
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long"
+      });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is incorrect"
+      });
+    }
+
+    // Hash new password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully"
+    });
+
+  } catch (error) {
+    console.error("Change password error:", error);
+    
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID format"
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
   }
 };
 
@@ -76,4 +233,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  updateUserProfile,
+  changePassword
 };

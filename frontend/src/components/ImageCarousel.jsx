@@ -22,7 +22,7 @@ const ImageCarousel = ({ images, placeholder }) => {
   };
 
   return (
-    <div className="relative h-48 overflow-hidden rounded-t-xl">
+    <div className="relative h-72 overflow-hidden rounded-t-xl">
       {/* Gambar Aktif */}
       <img src={images[currentIndex]?.image_cabin_url ? getImageUrl(images[currentIndex].image_cabin_url) : placeholder} alt={`Cabin ${currentIndex + 1}`} className="w-full h-full object-cover transition-opacity duration-300" />
 

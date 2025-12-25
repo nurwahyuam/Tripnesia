@@ -1,7 +1,9 @@
 const fs = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
 const Ship = require("../models/shipModel");
 const Cabin = require("../models/cabinShipModel");
+const BookingCabin = require("../models/bookingCabinModel");
 const Schedule = require("../models/scheduleModel");
 const PlanDays = require("../models/planDaysModel");
 const SpecificationShip = require("../models/specificationShipModel");
@@ -12,8 +14,45 @@ const ImagesCabin = require("../models/imageCabinModel");
 
 const getShips = async (req, res) => {
   try {
-    const ships = await Ship.find().select("name type merk class min_pax max_pax status slug createdAt");
-    res.status(200).json(ships);
+    const ships = await Ship.find().select("name type merk class min_pax max_pax status slug image_ship createdAt").lean();
+
+    const shipIds = ships.map((s) => s._id);
+    const [cabins, schedules] = await Promise.all([Cabin.find({ ship_id: { $in: shipIds } }).lean(), Schedule.find({ ship_id: { $in: shipIds } }).lean()]);
+    const cabinMap = {};
+    const scheduleMap = {};
+
+    cabins.forEach((cabin) => {
+      const id = cabin.ship_id.toString();
+      if (!cabinMap[id]) cabinMap[id] = [];
+      cabinMap[id].push(cabin);
+    });
+
+    schedules.forEach((sched) => {
+      const id = sched.ship_id.toString();
+      if (!scheduleMap[id]) scheduleMap[id] = [];
+      scheduleMap[id].push(sched);
+    });
+
+    // Gabungkan semuanya jadi satu array
+    const shipsData = ships.map((ship) => {
+      const shipId = ship._id.toString();
+      const shipCabins = cabinMap[shipId] || [];
+      const shipSchedules = scheduleMap[shipId] || [];
+
+      // Hitung harga minimum
+      const prices = shipCabins.map((c) => parseFloat(c.price?.replace(/[^0-9]/g, ""))).filter((p) => !isNaN(p));
+
+      const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+
+      return {
+        ...ship,
+        minPrice,
+        cabins: shipCabins,
+        schedules: shipSchedules,
+      };
+    });
+
+    res.status(200).json(shipsData);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -73,12 +112,108 @@ const getPublicShips = async (req, res) => {
   }
 };
 
+// const getShipBySlug = async (req, res) => {
+//   try {
+//     const { slug } = req.params;
+
+//     // Ambil data kapal utama
+//     const ship = await Ship.findOne({ slug: slug }).populate("schedules").populate("images").populate("facilities").populate("specifications").populate("tools").lean();
+
+//     if (!ship) {
+//       return res.status(404).json({ message: "Ship not found" });
+//     }
+
+//     // Ambil semua kabin untuk kapal ini
+//     const cabins = await Cabin.find({ ship_id: ship._id }).lean();
+
+//     // --- PERUBAHAN UTAMA: Hitung kapasitas yang sudah dipesan ---
+//     // Asumsikan model BookingCabin memiliki field: { booking_id, cabin_id, pax: { adult, child }, date_start, date_end }
+//     // Asumsikan model Booking memiliki field: { status } (misalnya: 'pending', 'confirmed', 'cancelled')
+
+//     // Ambil semua booking cabin yang terkait dengan kabin-kabin ini dan statusnya 'pending' atau 'confirmed'
+//     const confirmedBookingCabins = await BookingCabin.aggregate([
+//       {
+//         $match: {
+//           cabin_id: { $in: cabins.map((c) => c._id) },
+//           // Asumsikan field status booking ada di model BookingCabin atau di lookup dari Booking
+//           // Jika status di Booking, lakukan lookup dulu
+//           // Kita asumsikan status ada di BookingCabin untuk contoh ini, atau kita lookup
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "bookings", // Nama koleksi booking Anda
+//           localField: "booking_id",
+//           foreignField: "_id",
+//           as: "booking_details",
+//         },
+//       },
+//       {
+//         $unwind: "$booking_details",
+//       },
+//       {
+//         $match: {
+//           // Filter hanya booking dengan status 'pending' atau 'confirmed'
+//           "booking_details.status": { $in: ["pending", "confirmed"] }, // Tambahkan status lain yang dianggap "mengambil slot"
+//         },
+//       },
+//       {
+//         $project: {
+//           cabin_id: 1,
+//           pax: 1, // Ambil jumlah pax dari booking cabin
+//           booking_status: "$booking_details.status",
+//           date_start: 1, // Ambil tanggal booking cabin
+//           date_end: 1, // Ambil tanggal booking cabin
+//           // Tambahkan field lain dari booking jika diperlukan
+//         },
+//       },
+//     ]);
+
+//     // Buat map untuk menyimpan jumlah pax yang sudah dipesan per kabin *per rentang tanggal*
+//     const bookedPaxMap = new Map();
+//     confirmedBookingCabins.forEach((item) => {
+//       const key = `${item.cabin_id.toString()}-${item.date_start}-${item.date_end}`;
+//       const paxCount = (item.pax?.adult || 0) + (item.pax?.child || 0);
+//       bookedPaxMap.set(key, (bookedPaxMap.get(key) || 0) + paxCount);
+//     });
+
+//     // Tambahkan kapasitas tersisa ke setiap kabin dalam rentang tanggalnya
+//     const cabinsWithCapacity = cabins.map((cabin) => {
+//       // Hitung kapasitas yang sudah dipesan untuk rentang tanggal kabin ini
+//       const key = `${cabin._id.toString()}-${cabin.date_start}-${cabin.date_end}`;
+//       const bookedPax = bookedPaxMap.get(key) || 0;
+//       const maxCapacity = cabin.pax || 0;
+//       const remainingCapacity = Math.max(0, maxCapacity - bookedPax);
+
+//       return {
+//         ...cabin,
+//         // Tambahkan field kapasitas tersisa
+//         remaining_capacity: remainingCapacity,
+//         // Opsional: tambahkan jumlah pax yang sudah dipesan
+//         booked_pax_count: bookedPax,
+//       };
+//     });
+//     // --- AKHIR PERUBAHAN ---
+
+//     // Gabungkan data kapal dengan kabin yang sudah di-update
+//     const shipData = {
+//       ...ship,
+//       cabins: cabinsWithCapacity, // Gunakan kabin yang sudah memiliki remaining_capacity
+//       // ... field lainnya
+//     };
+
+//     res.status(200).json(shipData);
+//   } catch (error) {
+//     console.error("Error fetching ship by slug:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
 const getPublicShipBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // 1. Cari ship berdasarkan slug
-    const ship = await Ship.findOne({ slug }).select("name type merk class min_pax max_pax status slug description image_ship").lean();
+    const ship = await Ship.findOne({ slug }).select("name type merk class min_pax max_pax status slug package unpackage description image_ship").lean();
 
     if (!ship) {
       return res.status(404).json({
@@ -100,6 +235,7 @@ const getPublicShipBySlug = async (req, res) => {
     ]);
 
     let cabinImagesMap = {};
+    let planDaysMap = {};
     if (cabins.length > 0) {
       const cabinIds = cabins.map((c) => c._id.toString());
 
@@ -114,18 +250,35 @@ const getPublicShipBySlug = async (req, res) => {
         return acc;
       }, {});
     }
+    if (schedules.length > 0) {
+      const planIds = schedules.map((s) => s._id);
+      const planDays = await PlanDays.find({ plan_id: { $in: planIds } }).lean();
 
-    const cabinsWithImages = cabins.map(cabin => ({
+      planDays.forEach((pd) => {
+        const key = pd.plan_id.toString();
+        if (!planDaysMap[key]) planDaysMap[key] = [];
+
+        const plansArray = Object.values(pd.plans || {});
+        planDaysMap[key].push({
+          ...pd,
+          plans: plansArray,
+        });
+      });
+    }
+
+    const cabinsWithImages = cabins.map((cabin) => ({
       ...cabin,
       images: cabinImagesMap[cabin._id.toString()] || [],
     }));
 
-    // 3. Hitung harga minimum dari cabin
+    const schedulesWithPlans = schedules.map((sched) => ({
+      ...sched,
+      plans: planDaysMap[sched._id.toString()] || [],
+    }));
+
     const prices = cabins
       .map((cabin) => {
-        // Harga bisa string (e.g., "IDR 4.150.000") atau number
         let priceStr = cabin.price?.toString() || "";
-        // Hapus semua non-digit
         const numeric = priceStr.replace(/[^0-9]/g, "");
         return numeric ? parseFloat(numeric) : null;
       })
@@ -137,7 +290,7 @@ const getPublicShipBySlug = async (req, res) => {
       ...ship,
       minPrice,
       cabins: cabinsWithImages,
-      schedules,
+      schedules: schedulesWithPlans,
       images,
       facilities,
       specifications,
@@ -637,6 +790,7 @@ const deleteShip = async (req, res) => {
 module.exports = {
   getShips,
   getPublicShips,
+  // getShipBySlug,
   getPublicShipBySlug,
   getShipById,
   createShip,

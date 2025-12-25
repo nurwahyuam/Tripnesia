@@ -11,6 +11,7 @@ import { Calendar, Pencil, Plus, ShieldAlert, ShieldCheck, Trash2, X } from "luc
 const Promos = () => {
   const { promos, loading, error, createPromo, updatePromo, deletePromo, message, clearMessage } = usePromos();
 
+  console.log(promos);
   const { currentData: currentPromos, currentPage, totalPages, goToPage, nextPage, prevPage, setCurrentPage } = usePagination(promos, 5);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -48,11 +49,20 @@ const Promos = () => {
   };
 
   const openEditModal = (promo) => {
+    let price = "";
+    let percentage = "";
+
+    if (promo.discount_type === "fixed") {
+      price = promo.discount_value;
+    } else if (promo.discount_type === "percentage") {
+      percentage = promo.discount_value;
+    }
+
     setFormData({
       code: promo.code || "",
       description: promo.description || "",
-      price: promo.price != null ? Number(promo.price) : "",
-      percentage: promo.percentage != null ? Number(promo.percentage) : "",
+      price: price, // string atau number
+      percentage: percentage,
       start_date: formatDateForInput(promo.start_date),
       end_date: formatDateForInput(promo.end_date),
       status: promo.status ?? true,
@@ -219,12 +229,13 @@ const Promos = () => {
               {currentPromos.map((promo) => (
                 <tr key={promo._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-left font-bold text-gray-600">{promo.code}</td>
+                  {/* Type */}
                   <td className="px-6 py-4 text-gray-700">
-                    <span className="border border-gray-400 rounded-full px-5 py-1 text-sm font-semibold">{promo.percentage && promo.price ? "% Mix" : promo.percentage ? "% Percentage" : promo.price ? "% Price" : "–"}</span>
+                    <span className="border border-gray-400 rounded-full px-3 py-1 text-xs font-medium capitalize">{promo.discount_type === "fixed" ? "Fixed Price" : "Percentage"}</span>
                   </td>
-                  <td className="px-6 py-4 text-center text-gray-700">
-                    {promo.percentage && promo.price ? `${formatRupiah(promo.price)} & ${promo.percentage}%` : promo.percentage ? `${promo.percentage}%` : promo.price ? formatRupiah(promo.price) : "–"}
-                  </td>
+
+                  {/* Discount Value */}
+                  <td className="px-6 py-4 text-center text-gray-700">{promo.discount_type === "fixed" ? formatRupiah(promo.discount_value) : `${promo.discount_value}% `}</td>
                   <td className="px-6 py-4 text-gray-700 text-sm text-center flex items-center gap-1 justify-center">
                     <Calendar className="w-4 h-4" />
                     {promo.start_date && promo.end_date ? `${new Date(promo.start_date).toISOString().split("T")[0]} to ${new Date(promo.end_date).toISOString().split("T")[0]}` : "–"}
